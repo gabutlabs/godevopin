@@ -1,0 +1,74 @@
+package worker
+
+import (
+	"encoding/json"
+	"fmt"
+	"log"
+
+	"github.com/gabutlabs/devopin/internal/config"
+	"github.com/gabutlabs/devopin/internal/model"
+	service "github.com/gabutlabs/devopin/internal/services"
+)
+
+type ThresholdAutomation struct {
+	workerService       service.WorkerServiceService
+	systemMetricService service.SystemMetricService
+	alarmService        service.AlarmService
+	config              *config.Config
+}
+
+// NewSyncer creates a new Syncer instance.
+func NewThresholdAutomation(ws service.WorkerServiceService, sm service.SystemMetricService, als service.AlarmService, cfg *config.Config) *ThresholdAutomation {
+	return &ThresholdAutomation{
+		workerService:       ws,
+		systemMetricService: sm,
+		alarmService:        als,
+		config:              cfg,
+	}
+}
+
+func (ta *ThresholdAutomation) AlarmWorker() {
+	metric, err := ta.systemMetricService.GetLastSystemMetricFilter("1 hour")
+	if err != nil {
+		log.Printf("Error get last system metric: %v", err)
+	}
+	if metric.AvgCPUUsage > ta.config.Settings.Alarms.Thresholds.SystemCPUCriticalPercent {
+		activeAlarm, err := ta.alarmService.CreateActiveAlarm("CPU_ALARM", "system:cpu", model.StatusFiring, fmt.Sprintf("CPU usage last 1 hour greater than %.2f%%", ta.config.Settings.Alarms.Thresholds.SystemCPUCriticalPercent))
+		if err != nil {
+			log.Printf("Error create active alarm cpu: %v", err)
+		}
+		metaData, err := json.Marshal(activeAlarm)
+		if err != nil {
+			fmt.Println("Error marshalling JSON:", err)
+		}
+		ta.alarmService.CreateAlarmHistory("CPU_ALARM", "system:cpu", model.AlarmStatusFiring, activeAlarm.Message, metaData)
+		// do alarm notification to email,telegram or whatsapp
+	}
+	if metric.AvgDiskUsage > ta.config.Settings.Alarms.Thresholds.SystemDiskCriticalPercent {
+		activeAlarm, err := ta.alarmService.CreateActiveAlarm("DISK_ALARM", "system:disk", model.StatusFiring, fmt.Sprintf("DISK usage greater than %.2f%%", ta.config.Settings.Alarms.Thresholds.SystemDiskCriticalPercent))
+		if err != nil {
+			log.Printf("Error create active alarm disk: %v", err)
+
+		}
+		metaData, err := json.Marshal(activeAlarm)
+		if err != nil {
+			log.Println("Error marshalling JSON:", err)
+		}
+		ta.alarmService.CreateAlarmHistory("DISK_ALARM", "system:disk", model.AlarmStatusFiring, activeAlarm.Message, metaData)
+		// do alarm notification to email,telegram or whatsapp
+
+	}
+	if metric.AvgMemUsage > ta.config.Settings.Alarms.Thresholds.SystemDiskCriticalPercent {
+		activeAlarm, err := ta.alarmService.CreateActiveAlarm("MEMORY_ALARM", "system:memory", model.StatusFiring, fmt.Sprintf("Memory usage last 1 hour greater than %.2f%%", ta.config.Settings.Alarms.Thresholds.SystemMemCriticalPercent))
+		if err != nil {
+			log.Printf("Error create active alarm memory: %v", err)
+		}
+		metaData, err := json.Marshal(activeAlarm)
+		if err != nil {
+			log.Println("Error marshalling JSON:", err)
+		}
+		ta.alarmService.CreateAlarmHistory("MEMORY_ALARM", "system:memory", model.AlarmStatusFiring, activeAlarm.Message, metaData)
+		// do alarm notification to email,telegram or whatsapp
+
+	}
+}

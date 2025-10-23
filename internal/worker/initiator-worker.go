@@ -29,6 +29,10 @@ func StartWorkers(cfg *config.Config, db *gorm.DB) {
 	workerService := service.NewWorkerServiceService(workerRepo)
 	hostSyncer := NewSyncer(workerService)
 
+	// Threshold automation worker
+	alarmRepo := repository.NewAlarmRepository(db)
+	alarmService := service.NewAlarmService(alarmRepo)
+	thresholdAutomation := NewThresholdAutomation(workerService, sysmetricService, alarmService, cfg)
 	// --- Determine intervals from config ---
 	// Correction: Using time.Second, not time.Minute
 	monitoringInterval := time.Duration(cfg.Settings.MonitoringIntervalSeconds) * time.Second
@@ -37,6 +41,7 @@ func StartWorkers(cfg *config.Config, db *gorm.DB) {
 	// --- Run all workers as periodic goroutines ---
 	runPeriodicTask(monitWorker.StartMonitoring, monitoringInterval)
 	runPeriodicTask(hostSyncer.SyncHostServices, syncInterval)
+	runPeriodicTask(thresholdAutomation.AlarmWorker, monitoringInterval)
 
 	log.Println("All workers are running. Press Ctrl+C to shut down.")
 

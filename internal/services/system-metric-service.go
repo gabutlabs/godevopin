@@ -13,6 +13,7 @@ type SystemMetricService interface {
 	GetSystemMetrics() (map[string]any, error)
 	GetFilteredSystemMetrics(filter string) ([]repository.ResultSystemMetric, error)
 	GetDiskUsage() (repository.ResultDiskUsage, error)
+	GetLastSystemMetricFilter(filter string) (repository.LastSystemMetric, error)
 }
 
 type systemMetricService struct {
@@ -69,4 +70,9 @@ func (s *systemMetricService) GetSystemMetrics() (map[string]any, error) {
 
 func (s *systemMetricService) GetFilteredSystemMetrics(filter string) ([]repository.ResultSystemMetric, error) {
 	return s.repository.FilterSystemMetrics(filter)
+}
+
+// GetLastSystemMetricFilter implements SystemMetricService.
+func (s *systemMetricService) GetLastSystemMetricFilter(filter string) (repository.LastSystemMetric, error) {
+	return s.repository.LastSystemMetricsFilter(filter)
 }

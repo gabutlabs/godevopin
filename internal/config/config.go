@@ -7,9 +7,23 @@ import (
 type AppConfig struct {
 	JWTSecret string `mapstructure:"jwt_secret"`
 }
+type Alarms struct {
+	CheckIntervalSeconds  int        `mapstructure:"check_interval_seconds"`
+	RepeatIntervalMinutes int        `mapstructure:"repeat_interval_minutes"`
+	Thresholds            Thresholds `mapstructure:"thresholds"`
+}
+
+// Thresholds mendefinisikan nilai ambang batas statis untuk alarm.
+type Thresholds struct {
+	SystemCPUCriticalPercent  float64 `mapstructure:"system_cpu_critical_percent"`
+	SystemDiskCriticalPercent float64 `mapstructure:"system_disk_critical_percent"`
+	SystemMemCriticalPercent  float64 `mapstructure:"system_mem_critical_percent"`
+	WorkerHeartbeatTimeout    int     `mapstructure:"worker_heartbeat_timeout_seconds"`
+}
 
 type Settings struct {
-	MonitoringIntervalSeconds int `mapstructure:"monitoring_interval_seconds"`
+	MonitoringIntervalSeconds int    `mapstructure:"monitoring_interval_seconds"`
+	Alarms                    Alarms `mapstructure:"alarms"`
 }
 
 type Config struct {

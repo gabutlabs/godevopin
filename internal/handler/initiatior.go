@@ -34,4 +34,10 @@ func SetupHandlers(router fiber.Router, db *gorm.DB, config *config.Config) {
 	workerServiceHandler := http_handler.NewWorkerServiceHandler(workerServiceService)
 	workerServiceHandler.SetupWorkerServiceRoutes(router)
 
+	// Setup Alarm routes
+	alarmRepo := repository.NewAlarmRepository(db)
+	alarmService := service.NewAlarmService(alarmRepo)
+	alarmHandler := http_handler.NewAlarmHandler(alarmService)
+	alarmHandler.SetupAlarmRoutes(router)
+
 }

@@ -8,3 +8,16 @@ app:
   jwt_secret: "aaaaa"
 settings:
   monitoring_interval_seconds: 10
+  alarms:
+  # Seberapa sering AlarmWorker berjalan untuk mengecek semua aturan
+  check_interval_seconds: 60 # Setiap 1 menit
+
+  # Seberapa sering notifikasi diulang jika alarm berstatus FIRING (belum di-Ack)
+  repeat_interval_minutes: 15 # Setiap 15 menit
+
+  # Daftar threshold statis Anda
+  thresholds:
+    system_cpu_critical_percent: 90.0
+    system_disk_critical_percent: 85.0
+    system_mem_critical_percent: 85.0
+    worker_heartbeat_timeout_seconds: 300

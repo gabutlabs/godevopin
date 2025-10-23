@@ -15,6 +15,11 @@
       <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
       <v-app-bar-title text="Godevopin Admin" />
       <div class="d-flex gap-2 mx-4 align-center">
+        <v-btn icon @click="() => router.push('/alarms')">
+          <v-badge location="top right" color="warning" dot>
+            <v-icon icon="mdi-bell"></v-icon>
+          </v-badge>
+        </v-btn>
         <v-btn @click="state.changeTheme" icon>
           <v-icon>{{
             state.theme === "light" ? "mdi-weather-sunny" : "mdi-weather-night"

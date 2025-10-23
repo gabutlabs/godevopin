@@ -15,6 +15,13 @@ type ResultSystemMetric struct {
 	AvgMemUsage  float64 `json:"avg_mem_usage"`
 }
 
+type LastSystemMetric struct {
+	TimeInterval string  `json:"time_interval"`
+	AvgCPUUsage  float64 `json:"avg_cpu_usage"`
+	AvgMemUsage  float64 `json:"avg_mem_usage"`
+	AvgDiskUsage float64 `json:"avg_disk_usage"`
+}
+
 type ResultDiskUsage struct {
 	DiskUsageByte float64 `json:"disk_usage_byte"`
 	DiskTotalByte float64 `json:"disk_total_byte"`
@@ -26,6 +33,7 @@ type SystemMetricRepository interface {
 	UpdateMetric(metric *model.SystemMetric) error
 	DeleteMetric(id uint) error
 	FilterSystemMetrics(filter string) ([]ResultSystemMetric, error)
+	LastSystemMetricsFilter(filter string) (LastSystemMetric, error)
 	GetDiskUsage() (ResultDiskUsage, error)
 }
 type systemMetricRepository struct {
@@ -146,4 +154,29 @@ func (r *systemMetricRepository) FilterSystemMetrics(filter string) ([]ResultSys
 		return nil, err
 	}
 	return metrics, nil
+}
+
+// LastSystemMetricsFilter implements SystemMetricRepository.
+func (r *systemMetricRepository) LastSystemMetricsFilter(filter string) (LastSystemMetric, error) {
+	var result LastSystemMetric
+	query := fmt.Sprintf(`
+				SELECT
+					-- Kelompokkan waktu ke dalam interval 15 detik
+					time_bucket('15 seconds', created_at) AS time_interval,
+					AVG(cpu_usage) AS avg_cpu_usage,
+					AVG(mem_usage_byte) AS avg_mem_usage,
+					AVG(disk_usage_byte) AS avg_disk_usage
+					FROM
+					system_metrics -- <--- Mengambil dari tabel data MENTAH
+					WHERE
+					created_at > NOW() - interval '%s' -- <--- Filter waktu Anda
+					GROUP BY
+					time_interval
+					ORDER BY
+					time_interval desc limit 1;
+				`, filter)
+	if err := r.db.Raw(query).Scan(&result).Error; err != nil {
+		return LastSystemMetric{}, err
+	}
+	return result, nil
 }
