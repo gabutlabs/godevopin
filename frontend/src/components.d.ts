@@ -9,6 +9,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     ActionTable: typeof import('./components/ActionTable.vue')['default']
+    ActiveAlarm: typeof import('./components/features/alarm/ActiveAlarm.vue')['default']
     AppFooter: typeof import('./components/AppFooter.vue')['default']
     DiskUsageChart: typeof import('./components/DiskUsageChart.vue')['default']
     HelloWorld: typeof import('./components/HelloWorld.vue')['default']
