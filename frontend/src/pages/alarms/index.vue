@@ -1,6 +1,6 @@
 <template>
   <page-content title="Alarm">
-    <v-tabs color="primary" bg-color="white" hide-slider v-model="tab">
+    <v-tabs color="primary" hide-slider v-model="tab">
       <v-tab value="active">Active</v-tab>
       <v-tab value="history">History</v-tab>
     </v-tabs>
