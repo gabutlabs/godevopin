@@ -32,6 +32,7 @@ func (ta *ThresholdAutomation) AlarmWorker() {
 	if err != nil {
 		log.Printf("Error get last system metric: %v", err)
 	}
+	fmt.Println((metric.AvgDiskUsage/metric.AvgDiskTotal)*100 > ta.config.Settings.Alarms.Thresholds.SystemDiskCriticalPercent)
 	if metric.AvgCPUUsage > ta.config.Settings.Alarms.Thresholds.SystemCPUCriticalPercent {
 		activeAlarm, err := ta.alarmService.CreateActiveAlarm("CPU_ALARM", "system:cpu", model.StatusFiring, fmt.Sprintf("CPU usage last 1 hour greater than %.2f%%", ta.config.Settings.Alarms.Thresholds.SystemCPUCriticalPercent))
 		if err != nil {
@@ -44,7 +45,7 @@ func (ta *ThresholdAutomation) AlarmWorker() {
 		ta.alarmService.CreateAlarmHistory("CPU_ALARM", "system:cpu", model.AlarmStatusFiring, activeAlarm.Message, metaData)
 		// do alarm notification to email,telegram or whatsapp
 	}
-	if metric.AvgDiskUsage > ta.config.Settings.Alarms.Thresholds.SystemDiskCriticalPercent {
+	if (metric.AvgDiskUsage/metric.AvgDiskTotal)*100 > ta.config.Settings.Alarms.Thresholds.SystemDiskCriticalPercent {
 		activeAlarm, err := ta.alarmService.CreateActiveAlarm("DISK_ALARM", "system:disk", model.StatusFiring, fmt.Sprintf("DISK usage greater than %.2f%%", ta.config.Settings.Alarms.Thresholds.SystemDiskCriticalPercent))
 		if err != nil {
 			log.Printf("Error create active alarm disk: %v", err)

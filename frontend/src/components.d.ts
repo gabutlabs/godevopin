@@ -13,6 +13,7 @@ declare module 'vue' {
     AppFooter: typeof import('./components/AppFooter.vue')['default']
     DiskUsageChart: typeof import('./components/DiskUsageChart.vue')['default']
     HelloWorld: typeof import('./components/HelloWorld.vue')['default']
+    HistoryAlarm: typeof import('./components/features/alarm/HistoryAlarm.vue')['default']
     PageContent: typeof import('./components/PageContent.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']

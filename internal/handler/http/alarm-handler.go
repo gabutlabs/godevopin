@@ -63,6 +63,7 @@ func (h *AlarmHandler) GetAllActiveAlarms(c *fiber.Ctx) error {
 // @Failure 500 {object} map[string]any
 // @Router /alarms/history [get]
 func (h *AlarmHandler) GetAllAlarmHistoryPaginated(c *fiber.Ctx) error {
+
 	page, err := strconv.Atoi(c.Query("page", "1"))
 	if err != nil || page < 1 {
 		page = 1
@@ -74,7 +75,6 @@ func (h *AlarmHandler) GetAllAlarmHistoryPaginated(c *fiber.Ctx) error {
 	}
 
 	sort := c.Query("sort", "created_at DESC")
-
 	result, err := h.alarmService.GetAllAlarmHistoryPaginated(page, limit, sort)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(pkg.GenerateErrorResponse("Failed to retrieve alarm history", nil))

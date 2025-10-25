@@ -12,7 +12,7 @@
       </v-tabs-window-item>
       <v-tabs-window-item value="history">
         <v-sheet class="pa-5">
-          <v-data-table :items="state.historyAlarms.data"></v-data-table>
+          <HistoryAlarm />
         </v-sheet>
       </v-tabs-window-item>
     </v-tabs-window>
@@ -21,13 +21,5 @@
 <script lang="ts" setup>
 import PageContent from "@/components/PageContent.vue";
 import ActiveAlarmComponent from "@/components/features/alarm/ActiveAlarm.vue";
-import { useAlarmStore } from "@/stores/alarm";
 const tab = ref("active");
-const state = useAlarmStore();
-const page = ref(1);
-const limit = ref(10);
-
-onMounted(async () => {
-  await state.fetchHistoryAlarms(page.value, limit.value);
-});
 </script>

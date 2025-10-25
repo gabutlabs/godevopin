@@ -20,6 +20,7 @@ type LastSystemMetric struct {
 	AvgCPUUsage  float64 `json:"avg_cpu_usage"`
 	AvgMemUsage  float64 `json:"avg_mem_usage"`
 	AvgDiskUsage float64 `json:"avg_disk_usage"`
+	AvgDiskTotal float64 `json:"avg_disk_total"`
 }
 
 type ResultDiskUsage struct {
@@ -165,7 +166,8 @@ func (r *systemMetricRepository) LastSystemMetricsFilter(filter string) (LastSys
 					time_bucket('15 seconds', created_at) AS time_interval,
 					AVG(cpu_usage) AS avg_cpu_usage,
 					AVG(mem_usage_byte) AS avg_mem_usage,
-					AVG(disk_usage_byte) AS avg_disk_usage
+					AVG(disk_usage_byte) AS avg_disk_usage,
+					AVG(disk_total_byte) AS avg_disk_total
 					FROM
 					system_metrics -- <--- Mengambil dari tabel data MENTAH
 					WHERE

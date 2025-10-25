@@ -8,10 +8,17 @@ export type ActiveAlarm = {
   last_notified_at: string;
   message: string;
 };
+export type HistoryAlarm = {
+  created_at: string;
+  metadata: { [key: string]: any };
+} & Pick<ActiveAlarm, "alarm_name" | "target" | "status" | "message">;
 export const useAlarmStore = defineStore("alarm", {
   state: () => ({
     activeAlarms: [] as ActiveAlarm[],
-    historyAlarms: { data: [], pagination: undefined },
+    historyAlarms: { data: [], pagination: undefined } as {
+      data: HistoryAlarm[];
+      pagination: { total: number; page: number; limit: number } | undefined;
+    },
     activeAlarm: null,
     historyAlarm: null,
     action_result: { is_success: false, message: "", data: null } as {
@@ -32,7 +39,7 @@ export const useAlarmStore = defineStore("alarm", {
     async fetchHistoryAlarms(page: number, limit: number = 10) {
       try {
         const response = await axios.get(
-          `/alarms/history?page${page}&limit=${limit}`
+          `/alarms/history?page=${page}&limit=${limit}`
         );
         this.historyAlarms = response.data.data;
       } catch (error) {
