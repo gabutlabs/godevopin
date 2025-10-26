@@ -27,7 +27,7 @@ type AlarmService interface {
 	GetAlarmHistoryByTarget(target string) ([]model.AlarmHistory, error)
 	GetAlarmHistoryByStatus(status model.AlarmHistoryStatus) ([]model.AlarmHistory, error)
 	GetAllAlarmHistory(limit, offset int) ([]model.AlarmHistory, error)
-	GetAllAlarmHistoryPaginated(page, limit int, sort string) (pkg.PaginatedResponse[model.AlarmHistory], error)
+	GetAllAlarmHistoryPaginated(page, limit int, sort string, filterStatus string) (pkg.PaginatedResponse[model.AlarmHistory], error)
 	DeleteAlarmHistory(id uint) error
 	GetAlarmHistoryByAlarmNameAndTarget(alarmName, target string, limit, offset int) ([]model.AlarmHistory, error)
 	GetAlarmHistoryByAlarmNameAndTargetPaginated(alarmName, target string, page, limit int, sort string) (pkg.PaginatedResponse[model.AlarmHistory], error)
@@ -186,8 +186,8 @@ func (s *alarmService) GetAllActiveAlarmsPaginated(page, limit int, sort string)
 	return s.repository.GetAllActiveAlarmsPaginated(page, limit, sort)
 }
 
-func (s *alarmService) GetAllAlarmHistoryPaginated(page, limit int, sort string) (pkg.PaginatedResponse[model.AlarmHistory], error) {
-	return s.repository.GetAllAlarmHistoryPaginated(page, limit, sort)
+func (s *alarmService) GetAllAlarmHistoryPaginated(page, limit int, sort string, filterStatus string) (pkg.PaginatedResponse[model.AlarmHistory], error) {
+	return s.repository.GetAllAlarmHistoryPaginated(page, limit, sort, filterStatus)
 }
 
 func (s *alarmService) GetAlarmHistoryByAlarmNameAndTargetPaginated(alarmName, target string, page, limit int, sort string) (pkg.PaginatedResponse[model.AlarmHistory], error) {

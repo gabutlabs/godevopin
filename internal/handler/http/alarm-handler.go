@@ -75,7 +75,8 @@ func (h *AlarmHandler) GetAllAlarmHistoryPaginated(c *fiber.Ctx) error {
 	}
 
 	sort := c.Query("sort", "created_at DESC")
-	result, err := h.alarmService.GetAllAlarmHistoryPaginated(page, limit, sort)
+	filterStatus := c.Query("status", "")
+	result, err := h.alarmService.GetAllAlarmHistoryPaginated(page, limit, sort, filterStatus)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(pkg.GenerateErrorResponse("Failed to retrieve alarm history", nil))
 	}

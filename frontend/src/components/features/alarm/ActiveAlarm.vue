@@ -26,6 +26,9 @@ import { useNotify } from "@/composables/useNotify";
 import { useAlarmStore, type ActiveAlarm } from "@/stores/alarm";
 import { useAuthStore } from "@/stores/auth";
 import type { User } from "@/stores/user";
+const props = withDefaults(defineProps<{ filterStatus: string }>(), {
+  filterStatus: "FIRING",
+});
 const state = useAlarmStore();
 const authState = useAuthStore();
 const notify = useNotify();
@@ -49,7 +52,7 @@ const activeActionMenuItems = [
         { acknowledged_by: String(user.id) }
       );
       if (state.action_result.is_success) {
-        await state.fetchActiveAlarmByStatus("FIRING");
+        await state.fetchActiveAlarmByStatus(props.filterStatus);
       } else {
         notify.error(
           `Failed to acknowledge alarm: ${
@@ -60,7 +63,14 @@ const activeActionMenuItems = [
     },
   },
 ];
+watch(
+  () => props.filterStatus,
+  async (newStatus) => {
+    await state.fetchActiveAlarmByStatus(newStatus);
+  },
+  { immediate: true }
+);
 onMounted(async () => {
-  await state.fetchActiveAlarmByStatus("FIRING");
+  await state.fetchActiveAlarmByStatus(props.filterStatus);
 });
 </script>

@@ -27,7 +27,7 @@ type AlarmRepository interface {
 	GetAlarmHistoryByTarget(target string) ([]model.AlarmHistory, error)
 	GetAlarmHistoryByStatus(status model.AlarmHistoryStatus) ([]model.AlarmHistory, error)
 	GetAllAlarmHistory(limit, offset int) ([]model.AlarmHistory, error)
-	GetAllAlarmHistoryPaginated(page, limit int, sort string) (pkg.PaginatedResponse[model.AlarmHistory], error)
+	GetAllAlarmHistoryPaginated(page, limit int, sort string, filterStatus string) (pkg.PaginatedResponse[model.AlarmHistory], error)
 	UpdateAlarmHistory(history *model.AlarmHistory) error
 	DeleteAlarmHistory(id uint) error
 	GetAlarmHistoryByAlarmNameAndTarget(alarmName, target string, limit, offset int) ([]model.AlarmHistory, error)
@@ -154,67 +154,71 @@ func (r *alarmRepository) GetAlarmHistoryByAlarmNameAndTarget(alarmName, target 
 func (r *alarmRepository) GetAllActiveAlarmsPaginated(page, limit int, sort string) (pkg.PaginatedResponse[model.ActiveAlarm], error) {
 	var alarms []model.ActiveAlarm
 	var total int64
-	
+
 	offset := (page - 1) * limit
-	
+
 	query := r.db.Model(&model.ActiveAlarm{})
-	
+
 	if err := query.Count(&total).Error; err != nil {
 		return pkg.PaginatedResponse[model.ActiveAlarm]{}, err
 	}
-	
+
 	if sort != "" {
 		query = query.Order(sort)
 	} else {
 		query = query.Order("created_at DESC") // Default sort
 	}
-	
+
 	if err := query.Offset(offset).Limit(limit).Find(&alarms).Error; err != nil {
 		return pkg.PaginatedResponse[model.ActiveAlarm]{}, err
 	}
-	
+
 	pagination := pkg.Pagination{
 		Page:  page,
 		Limit: limit,
 		Sort:  sort,
 		Total: total,
 	}
-	
+
 	return pkg.PaginatedResponse[model.ActiveAlarm]{
 		Data:       alarms,
 		Pagination: pagination,
 	}, nil
 }
 
-func (r *alarmRepository) GetAllAlarmHistoryPaginated(page, limit int, sort string) (pkg.PaginatedResponse[model.AlarmHistory], error) {
+func (r *alarmRepository) GetAllAlarmHistoryPaginated(page, limit int, sort string, filterStatus string) (pkg.PaginatedResponse[model.AlarmHistory], error) {
 	var history []model.AlarmHistory
 	var total int64
-	
+
 	offset := (page - 1) * limit
-	
+
 	query := r.db.Model(&model.AlarmHistory{})
-	
+
 	if err := query.Count(&total).Error; err != nil {
 		return pkg.PaginatedResponse[model.AlarmHistory]{}, err
 	}
-	
+
 	if sort != "" {
 		query = query.Order(sort)
 	} else {
 		query = query.Order("created_at DESC") // Default sort
 	}
-	
+
+	if filterStatus != "" {
+		query = query.Where("status = ?", filterStatus)
+	}
+
 	if err := query.Offset(offset).Limit(limit).Find(&history).Error; err != nil {
 		return pkg.PaginatedResponse[model.AlarmHistory]{}, err
 	}
-	
+
 	pagination := pkg.Pagination{
 		Page:  page,
 		Limit: limit,
 		Sort:  sort,
 		Total: total,
 	}
-	
+
 	return pkg.PaginatedResponse[model.AlarmHistory]{
 		Data:       history,
 		Pagination: pagination,
@@ -224,32 +228,32 @@ func (r *alarmRepository) GetAllAlarmHistoryPaginated(page, limit int, sort stri
 func (r *alarmRepository) GetAlarmHistoryByAlarmNameAndTargetPaginated(alarmName, target string, page, limit int, sort string) (pkg.PaginatedResponse[model.AlarmHistory], error) {
 	var history []model.AlarmHistory
 	var total int64
-	
+
 	offset := (page - 1) * limit
-	
+
 	query := r.db.Model(&model.AlarmHistory{}).Where("alarm_name = ? AND target = ?", alarmName, target)
-	
+
 	if err := query.Count(&total).Error; err != nil {
 		return pkg.PaginatedResponse[model.AlarmHistory]{}, err
 	}
-	
+
 	if sort != "" {
 		query = query.Order(sort)
 	} else {
 		query = query.Order("created_at DESC") // Default sort
 	}
-	
+
 	if err := query.Offset(offset).Limit(limit).Find(&history).Error; err != nil {
 		return pkg.PaginatedResponse[model.AlarmHistory]{}, err
 	}
-	
+
 	pagination := pkg.Pagination{
 		Page:  page,
 		Limit: limit,
 		Sort:  sort,
 		Total: total,
 	}
-	
+
 	return pkg.PaginatedResponse[model.AlarmHistory]{
 		Data:       history,
 		Pagination: pagination,

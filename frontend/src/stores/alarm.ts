@@ -45,10 +45,14 @@ export const useAlarmStore = defineStore("alarm", {
         console.error("Fetch users failed:", error);
       }
     },
-    async fetchHistoryAlarms(page: number, limit: number = 10) {
+    async fetchHistoryAlarms(
+      page: number,
+      limit: number = 10,
+      filterStatus: string = ""
+    ) {
       try {
         const response = await axios.get(
-          `/alarms/history?page=${page}&limit=${limit}`
+          `/alarms/history?page=${page}&limit=${limit}&status=${filterStatus}`
         );
         this.historyAlarms = response.data.data;
       } catch (error) {

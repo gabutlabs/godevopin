@@ -17,6 +17,9 @@
 </template>
 <script setup lang="ts">
 import { useAlarmStore } from "@/stores/alarm";
+const props = withDefaults(defineProps<{ filterStatus: string }>(), {
+  filterStatus: "",
+});
 const historyHeaders = [
   { title: "Alarm Name", value: "alarm_name" },
   { title: "Target", value: "target" },
@@ -36,15 +39,32 @@ function loadHistoryAlarms({ page, itemsPerPage, sortBy }: any) {
   pagination.pageSize = itemsPerPage;
   loading.value = true;
   state
-    .fetchHistoryAlarms(pagination.currentPage, pagination.pageSize)
+    .fetchHistoryAlarms(
+      pagination.currentPage,
+      pagination.pageSize,
+      props.filterStatus
+    )
     .finally(() => {
       loading.value = false;
     });
 }
+watch(
+  () => props.filterStatus,
+  () => {
+    loadHistoryAlarms({
+      page: pagination.currentPage,
+      itemsPerPage: pagination.pageSize,
+    });
+  }
+);
 onMounted(() => {
   loading.value = true;
   state
-    .fetchHistoryAlarms(pagination.currentPage, pagination.pageSize)
+    .fetchHistoryAlarms(
+      pagination.currentPage,
+      pagination.pageSize,
+      props.filterStatus
+    )
     .finally(() => {
       loading.value = false;
     });
