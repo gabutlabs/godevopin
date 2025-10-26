@@ -14,6 +14,7 @@ declare module 'vue' {
     DiskUsageChart: typeof import('./components/DiskUsageChart.vue')['default']
     HelloWorld: typeof import('./components/HelloWorld.vue')['default']
     HistoryAlarm: typeof import('./components/features/alarm/HistoryAlarm.vue')['default']
+    Notify: typeof import('./components/Notify.vue')['default']
     PageContent: typeof import('./components/PageContent.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']

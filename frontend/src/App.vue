@@ -1,14 +1,12 @@
 <template>
   <v-app :theme="state.theme">
     <router-view />
-    <Notivue v-slot="item">
-      <Notification :item="item" />
-    </Notivue>
+    <Notify />
   </v-app>
 </template>
 
 <script lang="ts" setup>
 import { useAppStore } from "./stores/app";
-import { Notivue, Notification } from "notivue";
+import Notify from "./components/Notify.vue";
 const state = useAppStore();
 </script>

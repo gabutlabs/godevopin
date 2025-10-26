@@ -70,12 +70,13 @@ a {
 </template>
 
 <script setup lang="ts">
+import { useNotify } from "@/composables/useNotify";
 import { useAuthStore } from "@/stores/auth";
 import useVuelidate from "@vuelidate/core";
 import { email, required } from "@vuelidate/validators";
-import { push } from "notivue";
 const isPasswordVisible = ref(false);
 // Script untuk halaman login Anda
+const notify = useNotify();
 const formState = reactive({
   email: "",
   password: "",
@@ -99,8 +100,9 @@ async function submit() {
     // Login berhasil, arahkan ke halaman dashboard atau halaman yang diinginkan
     router.push("/"); // Ganti dengan rute yang sesuai
   } else {
+    console.error("hai rerp");
     // Login gagal, tampilkan pesan kesalahan atau lakukan tindakan lain
-    push.error("Login failed. Please check your credentials.");
+    notify.error("Login failed. Please check your credentials.");
   }
 }
 </script>

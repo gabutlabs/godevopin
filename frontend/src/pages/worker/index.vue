@@ -109,6 +109,7 @@
 </template>
 
 <script lang="ts" setup>
+import { useNotify } from "@/composables/useNotify";
 import {
   useWorkerServiceStore,
   type WorkerService,
@@ -117,9 +118,8 @@ import {
 } from "@/stores/worker-service";
 import useVuelidate from "@vuelidate/core";
 import { required, maxLength } from "@vuelidate/validators";
-import { push } from "notivue";
 import { computed, ref, watch, reactive, onMounted } from "vue";
-
+const notify = useNotify();
 const state = useWorkerServiceStore();
 const dialog = ref(false);
 const name = ref("");
@@ -189,9 +189,9 @@ const getActionMenuItems = (item: WorkerService) => [
       await state.updateStatusWorkerService(item.id, "starting");
       if (state.action_result.is_success) {
         await state.fetchAllWorkerServices();
-        push.success(`Worker service started successfully`);
+        notify.success(`Worker service started successfully`);
       } else {
-        push.error(state.action_result.message);
+        notify.error(state.action_result.message);
       }
     },
   },
@@ -203,9 +203,9 @@ const getActionMenuItems = (item: WorkerService) => [
       await state.updateStatusWorkerService(item.id, "stopped");
       if (state.action_result.is_success) {
         await state.fetchAllWorkerServices();
-        push.success(`Worker service stopped successfully`);
+        notify.success(`Worker service stopped successfully`);
       } else {
-        push.error(state.action_result.message);
+        notify.error(state.action_result.message);
       }
     },
   },
@@ -217,9 +217,9 @@ const getActionMenuItems = (item: WorkerService) => [
       await state.updateStatusWorkerService(item.id, "restart");
       if (state.action_result.is_success) {
         await state.fetchAllWorkerServices();
-        push.success(`Worker service restarted successfully`);
+        notify.success(`Worker service restarted successfully`);
       } else {
-        push.error(state.action_result.message);
+        notify.error(state.action_result.message);
       }
     },
   },
@@ -231,9 +231,9 @@ const getActionMenuItems = (item: WorkerService) => [
       await state.deleteWorkerService(item.id);
       if (state.action_result.is_success) {
         await state.fetchAllWorkerServices();
-        push.success(state.action_result.message);
+        notify.success(state.action_result.message);
       } else {
-        push.error(state.action_result.message);
+        notify.error(state.action_result.message);
       }
     },
   },
@@ -285,7 +285,7 @@ async function submit() {
   }
 
   if (state.action_result.is_success) {
-    push.success(state.action_result.message);
+    notify.success(state.action_result.message);
     dialog.value = false;
 
     // Reset form after successful submission
@@ -293,7 +293,7 @@ async function submit() {
 
     await state.fetchAllWorkerServices();
   } else {
-    push.error(
+    notify.error(
       `${state.action_result.message} : \n ${
         state.action_result.data != null
           ? Object.values(state.action_result.data).join("\n ")

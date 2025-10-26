@@ -33,8 +33,8 @@ export const useAuthStore = defineStore("auth", {
     async me() {
       try {
         const response = await axios.get("/auth/me");
-        this.user = response.data.data;
-        localStorage.setItem("user", JSON.stringify(response.data.data));
+        this.user = response.data.data.user;
+        localStorage.setItem("user", JSON.stringify(response.data.data.user));
         this.loggedIn = response.data.data.is_loggedin;
       } catch (error) {
         console.error("Fetch user profile failed:", error);

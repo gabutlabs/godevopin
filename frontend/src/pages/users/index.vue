@@ -71,10 +71,10 @@
   </page-content>
 </template>
 <script setup lang="ts">
+import { useNotify } from "@/composables/useNotify";
 import { useUserStore, type User } from "@/stores/user";
 import useVuelidate from "@vuelidate/core";
 import { email, required } from "@vuelidate/validators";
-import { push } from "notivue";
 import { ref, watch } from "vue";
 const name = ref("");
 const dialog = ref(false);
@@ -85,6 +85,7 @@ const payload = reactive({
   name: "",
   is_updated: false,
 });
+const notify = useNotify();
 const rules = {
   name: { required },
   email: { required, email },
@@ -105,14 +106,14 @@ async function submit() {
   console.log(state.action_result);
   if (state.action_result.is_success) {
     // Login berhasil, arahkan ke halaman dashboard atau halaman yang diinginkan
-    push.success(state.action_result.message);
+    notify.success(state.action_result.message);
     dialog.value = false;
     payload.email = "";
     payload.name = "";
     await state.fetchAllUsers();
   } else {
     // Login gagal, tampilkan pesan kesalahan atau lakukan tindakan lain
-    push.error(
+    notify.error(
       `${state.action_result.message} : \n ${
         state.action_result.data != null
           ? Object.values(state.action_result.data).join("\n ")
@@ -141,9 +142,9 @@ const actionMenuItems = [
       await state.deleteUser(item.id);
       if (state.action_result.is_success) {
         await state.fetchAllUsers();
-        push.success(state.action_result.message);
+        notify.success(state.action_result.message);
       } else {
-        push.error(state.action_result.message);
+        notify.error(state.action_result.message);
       }
     },
   },

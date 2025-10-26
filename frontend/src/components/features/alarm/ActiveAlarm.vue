@@ -22,8 +22,13 @@
 </template>
 <script lang="ts" setup>
 import ActionTable from "@/components/ActionTable.vue";
+import { useNotify } from "@/composables/useNotify";
 import { useAlarmStore, type ActiveAlarm } from "@/stores/alarm";
+import { useAuthStore } from "@/stores/auth";
+import type { User } from "@/stores/user";
 const state = useAlarmStore();
+const authState = useAuthStore();
+const notify = useNotify();
 const activeHeaders = [
   { title: "Alarm Name", value: "alarm_name" },
   { title: "Target", value: "target" },
@@ -35,12 +40,27 @@ const activeHeaders = [
 ];
 const activeActionMenuItems = [
   {
-    title: "Edit",
-    icon: "mdi-pencil",
-    onClick: (item: ActiveAlarm) => {},
+    title: "Acknowledge",
+    icon: "mdi-check-circle-outline",
+    onClick: async (item: ActiveAlarm) => {
+      const user = authState.user! as any as User;
+      await state.acknowledgeAlarm(
+        { alarmName: item.alarm_name, target: item.target },
+        { acknowledged_by: String(user.id) }
+      );
+      if (state.action_result.is_success) {
+        await state.fetchActiveAlarmByStatus("FIRING");
+      } else {
+        notify.error(
+          `Failed to acknowledge alarm: ${
+            state.action_result?.message ?? "Unknown error"
+          }`
+        );
+      }
+    },
   },
 ];
 onMounted(async () => {
-  await state.fetchActiveAlarms();
+  await state.fetchActiveAlarmByStatus("FIRING");
 });
 </script>

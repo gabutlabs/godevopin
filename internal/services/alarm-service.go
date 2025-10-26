@@ -1,6 +1,8 @@
 package service
 
 import (
+	"encoding/json"
+	"log"
 	"time"
 
 	"github.com/gabutlabs/devopin/internal/model"
@@ -125,7 +127,11 @@ func (s *alarmService) AcknowledgeActiveAlarm(alarmName, target, acknowledgedBy 
 	currentAlarm.Status = model.StatusAcknowledged
 	currentAlarm.AcknowledgedBy = &acknowledgedBy
 	currentAlarm.LastNotifiedAt = time.Now()
-
+	metaData, err := json.Marshal(currentAlarm)
+	if err != nil {
+		log.Println("Error marshalling JSON:", err)
+	}
+	s.CreateAlarmHistory(alarmName, target, model.AlarmHistoryStatus(model.StatusAcknowledged), currentAlarm.Message, metaData)
 	return s.repository.UpdateActiveAlarm(currentAlarm)
 }
 

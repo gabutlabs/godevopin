@@ -1,4 +1,5 @@
 import axios from "@/plugins/axios";
+import { AxiosError } from "axios";
 import { defineStore } from "pinia";
 export type ActiveAlarm = {
   alarm_name: string;
@@ -28,6 +29,14 @@ export const useAlarmStore = defineStore("alarm", {
     },
   }),
   actions: {
+    async fetchActiveAlarmByStatus(status: string) {
+      try {
+        const response = await axios.get(`/alarms/active/status/${status}`);
+        this.activeAlarms = response.data.data;
+      } catch (error) {
+        console.error("Fetch users failed:", error);
+      }
+    },
     async fetchActiveAlarms() {
       try {
         const response = await axios.get("/alarms/active");
@@ -44,6 +53,35 @@ export const useAlarmStore = defineStore("alarm", {
         this.historyAlarms = response.data.data;
       } catch (error) {
         console.error("Fetch users failed:", error);
+      }
+    },
+    async acknowledgeAlarm(
+      param: { alarmName: string; target: string },
+      payload: { acknowledged_by: string }
+    ) {
+      try {
+        console.log("Payload:", payload);
+        const response = await axios.post(
+          `/alarms/active/acknowledge/${param.alarmName}/${param.target}`,
+          payload
+        );
+        this.action_result = {
+          is_success: true,
+          message: response.data.message,
+          data: null,
+        };
+      } catch (error) {
+        let message = "Failed creating user";
+        let errors = undefined;
+        if (error instanceof AxiosError) {
+          message = error.response?.data.message;
+          errors = error.response?.data.errors;
+        }
+        this.action_result = {
+          is_success: false,
+          message: message,
+          data: errors,
+        };
       }
     },
   },
