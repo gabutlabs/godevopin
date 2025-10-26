@@ -206,10 +206,21 @@ func (h *AlarmHandler) AcknowledgeActiveAlarm(c *fiber.Ctx) error {
 	return c.JSON(pkg.GenerateResponse("Active alarm acknowledged successfully", nil))
 }
 
+func (h *AlarmHandler) GetCountActiveAlarm(c *fiber.Ctx) error {
+	filterStatus := c.Query("status", "FIRING")
+	count, err := h.alarmService.GetCountActiveAlarm(filterStatus)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(pkg.GenerateErrorResponse("Failed to retrieve active alarm count", nil))
+	}
+
+	return c.JSON(pkg.GenerateResponse("Active alarm count retrieved successfully", map[string]int64{"count": count}))
+}
+
 // SetupAlarmRoutes registers the alarm routes to the provided router
 func (h *AlarmHandler) SetupAlarmRoutes(router fiber.Router) {
 	alarmGroup := router.Group("/alarms")
 	alarmGroup.Get("/active", h.GetAllActiveAlarms)
+	alarmGroup.Get("/active/count", h.GetCountActiveAlarm)
 	alarmGroup.Get("/history", h.GetAllAlarmHistoryPaginated)
 	alarmGroup.Get("/active/status/:status", h.GetActiveAlarmByStatus)
 	alarmGroup.Put("/active/:alarmName/:target", h.UpdateActiveAlarm)

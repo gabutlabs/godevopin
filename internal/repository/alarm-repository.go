@@ -20,7 +20,7 @@ type AlarmRepository interface {
 	GetAllActiveAlarmsPaginated(page, limit int, sort string) (pkg.PaginatedResponse[model.ActiveAlarm], error)
 	UpdateActiveAlarm(alarm *model.ActiveAlarm) error
 	DeleteActiveAlarm(alarmName, target string) error
-
+	GetCountActiveAlarm(status string) (int64, error)
 	CreateAlarmHistory(history *model.AlarmHistory) error
 	GetAlarmHistoryByID(id uint) (*model.AlarmHistory, error)
 	GetAlarmHistoryByAlarmName(alarmName string) ([]model.AlarmHistory, error)
@@ -71,6 +71,18 @@ func (r *alarmRepository) GetAllActiveAlarms() ([]model.ActiveAlarm, error) {
 		return nil, err
 	}
 	return alarms, nil
+}
+
+func (r *alarmRepository) GetCountActiveAlarm(status string) (int64, error) {
+	var total int64
+	query := r.db.Model(&model.ActiveAlarm{})
+	if status != "" {
+		query = query.Where("status = ?", status)
+	}
+	if err := query.Count(&total).Error; err != nil {
+		return 0, err
+	}
+	return total, nil
 }
 
 func (r *alarmRepository) UpdateActiveAlarm(alarm *model.ActiveAlarm) error {

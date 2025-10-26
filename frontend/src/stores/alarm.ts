@@ -27,14 +27,23 @@ export const useAlarmStore = defineStore("alarm", {
       message: string;
       data: any;
     },
+    countActiveAlarms: 0,
   }),
   actions: {
+    async fetchCountActiveAlarm() {
+      try {
+        const response = await axios.get("/alarms/active/count");
+        this.countActiveAlarms = response.data.data.count;
+      } catch (error) {
+        console.error("Fetch alarms failed:", error);
+      }
+    },
     async fetchActiveAlarmByStatus(status: string) {
       try {
         const response = await axios.get(`/alarms/active/status/${status}`);
         this.activeAlarms = response.data.data;
       } catch (error) {
-        console.error("Fetch users failed:", error);
+        console.error("Fetch alarms failed:", error);
       }
     },
     async fetchActiveAlarms() {
@@ -42,7 +51,7 @@ export const useAlarmStore = defineStore("alarm", {
         const response = await axios.get("/alarms/active");
         this.activeAlarms = response.data.data;
       } catch (error) {
-        console.error("Fetch users failed:", error);
+        console.error("Fetch alarms failed:", error);
       }
     },
     async fetchHistoryAlarms(
@@ -56,7 +65,7 @@ export const useAlarmStore = defineStore("alarm", {
         );
         this.historyAlarms = response.data.data;
       } catch (error) {
-        console.error("Fetch users failed:", error);
+        console.error("Fetch alarms failed:", error);
       }
     },
     async acknowledgeAlarm(

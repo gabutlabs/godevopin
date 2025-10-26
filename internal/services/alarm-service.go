@@ -20,7 +20,7 @@ type AlarmService interface {
 	DeleteActiveAlarm(alarmName, target string) error
 	AcknowledgeActiveAlarm(alarmName, target, acknowledgedBy string) error
 	GetActiveAlarmsByStatus(status model.ActiveAlarmStatus) ([]model.ActiveAlarm, error)
-
+	GetCountActiveAlarm(status string) (int64, error)
 	CreateAlarmHistory(alarmName, target string, status model.AlarmHistoryStatus, message string, metadata []byte) error
 	GetAlarmHistoryByID(id uint) (*model.AlarmHistory, error)
 	GetAlarmHistoryByAlarmName(alarmName string) ([]model.AlarmHistory, error)
@@ -98,6 +98,10 @@ func (s *alarmService) GetActiveAlarmByAlarmName(alarmName string) ([]model.Acti
 
 func (s *alarmService) GetAllActiveAlarms() ([]model.ActiveAlarm, error) {
 	return s.repository.GetAllActiveAlarms()
+}
+
+func (s *alarmService) GetCountActiveAlarm(status string) (int64, error) {
+	return s.repository.GetCountActiveAlarm(status)
 }
 
 func (s *alarmService) UpdateActiveAlarm(alarmName, target string, status model.ActiveAlarmStatus, acknowledgedBy *string, message string) error {

@@ -16,7 +16,11 @@
       <v-app-bar-title text="Godevopin Admin" />
       <div class="d-flex gap-2 mx-4 align-center">
         <v-btn icon @click="() => router.push('/alarms')">
-          <v-badge location="top right" color="warning" dot>
+          <v-badge
+            location="top right"
+            color="warning"
+            :content="alarmState.countActiveAlarms"
+          >
             <v-icon icon="mdi-bell"></v-icon>
           </v-badge>
         </v-btn>
@@ -83,6 +87,7 @@
 
 <script setup>
 import sidebarMenu from "@/constants/sidebar-menu";
+import { useAlarmStore } from "@/stores/alarm";
 import { useAppStore } from "@/stores/app";
 import { useAuthStore } from "@/stores/auth";
 import { push } from "notivue";
@@ -92,6 +97,7 @@ const state = useAppStore();
 const authState = useAuthStore();
 const route = useRoute();
 const router = useRouter();
+const alarmState = useAlarmStore();
 const items = ref([
   { title: "Profile", icon: "mdi-account", to: "/profile" },
   {
@@ -107,4 +113,8 @@ const items = ref([
     style: "color:#C62828",
   },
 ]);
+
+onMounted(async () => {
+  await alarmState.fetchCountActiveAlarm();
+});
 </script>
