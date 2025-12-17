@@ -48,6 +48,13 @@
               {{ item.health_status }}
             </v-chip>
           </template>
+          <template #item.last_success_at="{ item }">
+            {{
+              item.last_success_at
+                ? new Date(item.last_success_at).toLocaleString()
+                : ""
+            }}
+          </template>
           <template #item.created_at="{ item }">
             {{ new Date(item.created_at).toLocaleString() }}
           </template>

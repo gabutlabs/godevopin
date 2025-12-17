@@ -2,13 +2,14 @@ package repository
 
 import (
 	"github.com/gabutlabs/devopin/internal/model"
+	"github.com/gabutlabs/devopin/pkg"
 	"gorm.io/gorm"
 )
 
 type WorkerServiceRepository interface {
 	CreateWorkerService(WorkerService *model.WorkerService) error
 	GetWorkerServiceByID(id uint) (*model.WorkerService, error)
-	ListWorkerServices() ([]model.WorkerService, error)
+	ListWorkerServices(filters map[string]map[string]string) ([]model.WorkerService, error)
 	UpdateWorkerService(WorkerService *model.WorkerService) error
 	DeleteWorkerService(id uint) error
 	GetWorkerServiceByName(name string) (*model.WorkerService, error)
@@ -46,12 +47,22 @@ func (r *workerServiceRepository) UpdateWorkerService(WorkerService *model.Worke
 func (r *workerServiceRepository) DeleteWorkerService(id uint) error {
 	return r.db.Delete(&model.WorkerService{}, id).Error
 }
-func (r *workerServiceRepository) ListWorkerServices() ([]model.WorkerService, error) {
-	var WorkerServices []model.WorkerService
-	if err := r.db.Find(&WorkerServices).Error; err != nil {
+func (r *workerServiceRepository) ListWorkerServices(filters map[string]map[string]string) ([]model.WorkerService, error) {
+	var ws []model.WorkerService
+	allowedColumns := map[string]string{
+		"name":           "name",
+		"current_status": "current_status",
+		"desired_state":  "desired_state",
+		"health_status":  "health_status",
+	}
+	query := r.db.Model(&model.WorkerService{})
+
+	queryBuilder := pkg.NewQueryParams(filters, query, allowedColumns)
+	query = queryBuilder.ApplyFilters()
+	if err := query.Find(&ws).Error; err != nil {
 		return nil, err
 	}
-	return WorkerServices, nil
+	return ws, nil
 }
 
 // GetWorkerServiceByName retrieves a WorkerService by its name

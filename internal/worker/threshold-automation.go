@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/gabutlabs/devopin/internal/config"
 	"github.com/gabutlabs/devopin/internal/model"
@@ -28,6 +29,11 @@ func NewThresholdAutomation(ws service.WorkerServiceService, sm service.SystemMe
 }
 
 func (ta *ThresholdAutomation) AlarmWorker() {
+	ta.metricAlarm()
+	ta.alarmWorkerService()
+}
+
+func (ta *ThresholdAutomation) metricAlarm() {
 	metric, err := ta.systemMetricService.GetLastSystemMetricFilter("1 hour")
 	if err != nil {
 		log.Printf("Error get last system metric: %v", err)
@@ -69,6 +75,27 @@ func (ta *ThresholdAutomation) AlarmWorker() {
 		}
 		ta.alarmService.CreateAlarmHistory("MEMORY_ALARM", "system:memory", model.AlarmStatusFiring, activeAlarm.Message, metaData)
 		// do alarm notification to email,telegram or whatsapp
+	}
+}
 
+func (ta *ThresholdAutomation) alarmWorkerService() {
+	filters := map[string]map[string]string{}
+	workers, err := ta.workerService.ListWorkerServices(filters)
+	if err != nil {
+		log.Printf("Error fetch worker list: %v", err)
+	}
+	heartbeatTimeout := time.Duration(ta.config.Settings.Alarms.Thresholds.WorkerHeartbeatTimeout) * time.Second
+	for _, v := range workers {
+		if v.LastHeartbeatAt != nil && time.Since(*v.LastHeartbeatAt) > heartbeatTimeout {
+			activeAlarm, err := ta.alarmService.CreateActiveAlarm(fmt.Sprintf("WORKER: %s", v.Name), "system:worker", model.StatusFiring, fmt.Sprintf("Worker %s inactive grather than %d second", v.Name, heartbeatTimeout))
+			if err != nil {
+				log.Printf("Error insert alarm worker: %v", err)
+			}
+			metaData, err := json.Marshal(activeAlarm)
+			if err != nil {
+				log.Println("Error marshalling JSON:", err)
+			}
+			ta.alarmService.CreateAlarmHistory(fmt.Sprintf("WORKER: %s", v.Name), "system:worker", model.AlarmStatusFiring, activeAlarm.Message, metaData)
+		}
 	}
 }

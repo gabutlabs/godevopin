@@ -20,7 +20,11 @@ func NewWorkerServiceHandler(svc service.WorkerServiceService) *WorkerServiceHan
 
 // GetAllWorkerServices handles GET /worker-services request
 func (h *WorkerServiceHandler) GetAllWorkerServices(c *fiber.Ctx) error {
-	workerServices, err := h.workerServiceService.ListWorkerServices()
+	var params pkg.FilterParams
+	if err := c.QueryParser(&params); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(pkg.GenerateErrorResponse("Invalid query parameters", nil))
+	}
+	workerServices, err := h.workerServiceService.ListWorkerServices(params.Filters)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(pkg.GenerateErrorResponse("Failed to retrieve worker services", nil))
 	}
@@ -53,9 +57,9 @@ func (h *WorkerServiceHandler) GetWorkerServiceByName(c *fiber.Ctx) error {
 // CreateWorkerService handles POST /worker-services request
 func (h *WorkerServiceHandler) CreateWorkerService(c *fiber.Ctx) error {
 	type CreateWorkerServiceRequest struct {
-		Name        string                `json:"name" validate:"required,min=2"`
-		Description string                `json:"description"`
-		DesiredState model.DesiredState   `json:"desired_state" validate:"required,oneof=enabled disabled"`
+		Name         string             `json:"name" validate:"required,min=2"`
+		Description  string             `json:"description"`
+		DesiredState model.DesiredState `json:"desired_state" validate:"required,oneof=enabled disabled"`
 	}
 
 	var req CreateWorkerServiceRequest
@@ -86,9 +90,9 @@ func (h *WorkerServiceHandler) CreateWorkerService(c *fiber.Ctx) error {
 // UpdateWorkerService handles PUT /worker-services/:id request
 func (h *WorkerServiceHandler) UpdateWorkerService(c *fiber.Ctx) error {
 	type UpdateWorkerServiceRequest struct {
-		Name        string               `json:"name" validate:"required,min=2"`
-		Description string               `json:"description"`
-		DesiredState model.DesiredState  `json:"desired_state" validate:"required,oneof=enabled disabled"`
+		Name         string             `json:"name" validate:"required,min=2"`
+		Description  string             `json:"description"`
+		DesiredState model.DesiredState `json:"desired_state" validate:"required,oneof=enabled disabled"`
 	}
 
 	var req UpdateWorkerServiceRequest

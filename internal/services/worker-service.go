@@ -21,7 +21,7 @@ type WorkerServiceService interface {
 	GetWorkerServiceByName(name string) (*model.WorkerService, error)
 	UpdateWorkerService(workerService *model.WorkerService) error
 	DeleteWorkerService(id uint) error
-	ListWorkerServices() ([]model.WorkerService, error)
+	ListWorkerServices(filters map[string]map[string]string) ([]model.WorkerService, error)
 	UpdateWorkerServiceStatus(id uint, currentStatus model.CurrentStatus, healthStatus model.HealthStatus) error
 	UpdateWorkerServiceHeartbeat(id uint) error
 }
@@ -76,8 +76,8 @@ func (s *workerServiceService) DeleteWorkerService(id uint) error {
 }
 
 // ListWorkerServices retrieves all WorkerServices
-func (s *workerServiceService) ListWorkerServices() ([]model.WorkerService, error) {
-	return s.repository.ListWorkerServices()
+func (s *workerServiceService) ListWorkerServices(filters map[string]map[string]string) ([]model.WorkerService, error) {
+	return s.repository.ListWorkerServices(filters)
 }
 
 // UpdateWorkerServiceStatus updates the status of a WorkerService
