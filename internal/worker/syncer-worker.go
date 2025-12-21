@@ -93,7 +93,6 @@ func (s *Syncer) discoverHostServices() ([]DiscoveredService, error) {
 
 // discoverLinuxServices berisi logika untuk systemd (Linux)
 func (s *Syncer) discoverLinuxServices() ([]DiscoveredService, error) {
-	// ... (implementasi D-Bus dari jawaban sebelumnya)
 	commonServices := map[string]bool{"nginx.service": true, "postgresql.service": true}
 	ctx := context.Background()
 	conn, err := dbus.NewSystemConnectionContext(ctx)

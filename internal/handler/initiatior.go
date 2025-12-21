@@ -40,4 +40,9 @@ func SetupHandlers(router fiber.Router, db *gorm.DB, config *config.Config) {
 	alarmHandler := http_handler.NewAlarmHandler(alarmService)
 	alarmHandler.SetupAlarmRoutes(router)
 
+	// Setup Docker routes
+	dockerService := service.NewDockerService()
+	dockerHandler := http_handler.NewDockerHandler(dockerService)
+	dockerHandler.SetupDockerRoutes(router)
+
 }

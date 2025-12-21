@@ -11,13 +11,17 @@ declare module 'vue' {
     ActionTable: typeof import('./components/ActionTable.vue')['default']
     ActiveAlarm: typeof import('./components/features/alarm/ActiveAlarm.vue')['default']
     AppFooter: typeof import('./components/AppFooter.vue')['default']
+    ContainerList: typeof import('./components/features/docker/container/ContainerList.vue')['default']
     DiskUsageChart: typeof import('./components/DiskUsageChart.vue')['default']
     HelloWorld: typeof import('./components/HelloWorld.vue')['default']
     HistoryAlarm: typeof import('./components/features/alarm/HistoryAlarm.vue')['default']
+    ImageList: typeof import('./components/features/docker/images/ImageList.vue')['default']
+    NetworkList: typeof import('./components/features/docker/network/NetworkList.vue')['default']
     Notify: typeof import('./components/Notify.vue')['default']
     PageContent: typeof import('./components/PageContent.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    VolumeList: typeof import('./components/features/docker/volume/VolumeList.vue')['default']
     WidgetLineChart: typeof import('./components/WidgetLineChart.vue')['default']
   }
 }

@@ -14,4 +14,9 @@ export default [
     icon: "mdi-toolbox-outline",
     title: "Worker",
   },
+  {
+    link: "/docker",
+    icon: "mdi-docker",
+    title: "Docker",
+  },
 ];
