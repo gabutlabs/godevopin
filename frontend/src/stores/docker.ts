@@ -10,11 +10,11 @@ import type {
 export const useDockerStore = defineStore("docker", {
   state: () => ({
     containers: [] as Array<ContainerInfo>,
-    container: {} as ContainerDetailInfo,
+    container: null as ContainerDetailInfo | null,
     images: [] as Array<ImageInfo>,
     networks: [] as Array<NetworkInfo>,
     volumes: [] as Array<VolumeInfo>,
-    loading: false,
+    loadingContainer: false,
   }),
   actions: {
     async fetchAllContainers() {
@@ -26,14 +26,14 @@ export const useDockerStore = defineStore("docker", {
       }
     },
     async fetchContainerInfo(id: string) {
-      this.loading = true;
+      this.loadingContainer = true;
       try {
         const response = await axios.get(`/docker/containers/${id}`);
         this.container = response.data.data;
-        this.loading = false;
       } catch (error) {
-        this.loading = false;
         console.error("Fetch alarms failed:", error);
+      } finally {
+        this.loadingContainer = false;
       }
     },
     async fetchAllImages() {

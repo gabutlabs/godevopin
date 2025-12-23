@@ -68,7 +68,10 @@
             :prepend-icon="v.icon"
             rounded
             slim
-            :active="route.fullPath == v.link"
+            :active="
+              route.fullPath == v.link ||
+              route.fullPath.startsWith(v.link + '/')
+            "
             :to="v.link"
             color="#536DFE"
           >

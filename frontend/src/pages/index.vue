@@ -42,7 +42,7 @@ meta:
       </v-col>
       <v-col cols="12">
         <WidgetLineChart
-          :data="widgetState.filteredMetrics"
+          :data="widgetState.filteredMetrics ?? []"
           title="CPU Usage"
           data-key="avg_cpu_usage"
           series-name="CPU (%)"
@@ -52,7 +52,7 @@ meta:
       </v-col>
       <v-col cols="12">
         <WidgetLineChart
-          :data="widgetState.filteredMetrics"
+          :data="widgetState.filteredMetrics ?? []"
           title="Memory Usage"
           data-key="avg_mem_usage"
           series-name="Memory (MiB)"

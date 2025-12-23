@@ -8,6 +8,7 @@ export function containerStateColor(state: ContainerState): string {
       break;
     case state == "exited":
       colorType = "red";
+      break;
     case state == "dead":
       colorType = "red";
       break;
