@@ -31,6 +31,18 @@ func (h *DockerHandler) GetContainers(c *fiber.Ctx) error {
 	return c.JSON(pkg.GenerateResponse("Containers retrieved successfully", containers))
 }
 
+func (h *DockerHandler) GetContainerInfo(c *fiber.Ctx) error {
+	id := c.Params("id")
+	containers, err := h.service.GetContainerInfo(c.Context(), id)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(
+			pkg.GenerateErrorResponse("Failed to get containers", err.Error()),
+		)
+	}
+
+	return c.JSON(pkg.GenerateResponse("Container info retrieved successfully", containers))
+}
+
 // GetImages handles GET /api/images
 func (h *DockerHandler) GetImages(c *fiber.Ctx) error {
 	images, err := h.service.GetImages(c.Context())
@@ -84,6 +96,7 @@ func (dh *DockerHandler) SetupDockerRoutes(router fiber.Router) {
 	docker := router.Group("/docker")
 
 	docker.Get("/containers", dh.GetContainers)
+	docker.Get("/containers/:id", dh.GetContainerInfo)
 	docker.Get("/images", dh.GetImages)
 	docker.Get("/networks", dh.GetNetworks)
 	docker.Get("/volumes", dh.GetVolumes)

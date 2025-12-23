@@ -11,6 +11,7 @@ declare module 'vue' {
     ActionTable: typeof import('./components/ActionTable.vue')['default']
     ActiveAlarm: typeof import('./components/features/alarm/ActiveAlarm.vue')['default']
     AppFooter: typeof import('./components/AppFooter.vue')['default']
+    ContainerInfo: typeof import('./components/features/docker/container/ContainerInfo.vue')['default']
     ContainerList: typeof import('./components/features/docker/container/ContainerList.vue')['default']
     DiskUsageChart: typeof import('./components/DiskUsageChart.vue')['default']
     HelloWorld: typeof import('./components/HelloWorld.vue')['default']

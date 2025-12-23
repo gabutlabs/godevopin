@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/api/types/volume"
@@ -28,6 +29,13 @@ type ContainerInfo struct {
 	State   string            `json:"state"`
 	Labels  map[string]string `json:"labels"`
 	Summary container.Summary `json:"summary"`
+}
+
+type ContainerDetailInfo struct {
+	ContainerInfo   `json:"container_info"`
+	Ports           []container.Port                  `json:"ports"`
+	NetworkSettings *container.NetworkSettingsSummary `json:"network_settings_summary"`
+	Mounts          []container.MountPoint            `json:"mounts"`
 }
 
 // ImageInfo represents image information
@@ -97,6 +105,49 @@ func (s *DockerService) GetContainers(ctx context.Context, all bool) ([]Containe
 	}
 
 	return result, nil
+}
+
+// GetContainers retrieves all containers
+func (s *DockerService) GetContainerInfo(ctx context.Context, id string) (*ContainerDetailInfo, error) {
+	filter := filters.NewArgs()
+	filter.Add("id", id)
+	containers, err := s.client.ContainerList(ctx, container.ListOptions{Filters: filter, All: true})
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to list containers: %w", err)
+	}
+
+	if len(containers) == 0 {
+		return nil, fmt.Errorf("container with ID %q not found", id)
+	}
+
+	c := containers[0]
+
+	name := ""
+	if len(c.Names) > 0 {
+		name = strings.TrimPrefix(c.Names[0], "/")
+	}
+
+	// Ambil 12 karakter pertama dari ID (aman)
+	shortID := c.ID
+	if len(shortID) > 12 {
+		shortID = shortID[:12]
+	}
+
+	result := ContainerDetailInfo{
+		ContainerInfo: ContainerInfo{
+			ID:     shortID,
+			Name:   name,
+			Image:  c.Image,
+			Status: c.Status,
+			State:  c.State,
+			Labels: c.Labels,
+		},
+		NetworkSettings: c.NetworkSettings,
+		Mounts:          c.Mounts,
+		Ports:           c.Ports,
+	}
+	return &result, nil
 }
 
 // GetImages retrieves all images
