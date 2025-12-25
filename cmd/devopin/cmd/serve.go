@@ -43,7 +43,7 @@ var serveCmd = &cobra.Command{
 		}
 		app := fiber.New()
 		app.Use(cors.New())
-
+		// -- HTTP Routes --
 		// Serve embedded frontend files
 		app.Get("/", func(c *fiber.Ctx) error {
 			indexHtml, err := web.IndexHtml.ReadFile("dist/index.html")
@@ -105,6 +105,13 @@ var serveCmd = &cobra.Command{
 		})
 		apiGroup := app.Group("/api")
 		handler.SetupHandlers(apiGroup, db, &cfg)
+		// -- END HTTP Routes --
+
+		// -- Socket Routes --
+		wsGroup := app.Group("/ws")
+		handler.SetupSocketHandlers(wsGroup, db, &cfg)
+		// -- END Socket Routes --
+
 		// Mulai server pada port yang ditentukan
 		fmt.Printf("Server Fiber berjalan di http://localhost:%d\n", port)
 		log.Fatal(app.Listen(fmt.Sprintf(":%d", port)))

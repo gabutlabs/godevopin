@@ -3,9 +3,11 @@ package handler
 import (
 	"github.com/gabutlabs/devopin/internal/config"
 	http_handler "github.com/gabutlabs/devopin/internal/handler/http"
+	"github.com/gabutlabs/devopin/internal/handler/socket"
 	"github.com/gabutlabs/devopin/internal/repository"
 	service "github.com/gabutlabs/devopin/internal/services"
 	jwtware "github.com/gofiber/contrib/jwt"
+	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
@@ -44,5 +46,19 @@ func SetupHandlers(router fiber.Router, db *gorm.DB, config *config.Config) {
 	dockerService := service.NewDockerService()
 	dockerHandler := http_handler.NewDockerHandler(dockerService)
 	dockerHandler.SetupDockerRoutes(router)
+}
 
+func SetupSocketHandlers(wsGroup fiber.Router, db *gorm.DB, config *config.Config) {
+	// Setup Docker Socket routes
+	wsGroup.Use(func(c *fiber.Ctx) error {
+		if websocket.IsWebSocketUpgrade(c) {
+			c.Locals("allowed", true)
+			return c.Next()
+		}
+		return fiber.ErrUpgradeRequired
+	})
+
+	dockerService := service.NewDockerService()
+	dockerSocketHandler := socket.NewDockerSocketHandler(dockerService)
+	dockerSocketHandler.SetupDockerSocketRoutes(wsGroup)
 }

@@ -13,6 +13,7 @@ declare module 'vue' {
     AppFooter: typeof import('./components/AppFooter.vue')['default']
     ContainerInfo: typeof import('./components/features/docker/container/ContainerInfo.vue')['default']
     ContainerList: typeof import('./components/features/docker/container/ContainerList.vue')['default']
+    ContainerLogs: typeof import('./components/features/docker/container/ContainerLogs.vue')['default']
     DiskUsageChart: typeof import('./components/DiskUsageChart.vue')['default']
     HelloWorld: typeof import('./components/HelloWorld.vue')['default']
     HistoryAlarm: typeof import('./components/features/alarm/HistoryAlarm.vue')['default']

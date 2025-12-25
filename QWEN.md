@@ -23,15 +23,21 @@ devopin/
 ├── README.md
 ├── go.mod
 ├── go.sum
+├── Makefile
+├── QWEN.md
+├── .gitignore
+├── build/...
 ├── cmd/
 │   └── devopin/
 │       ├── main.go
-│       └── cmd/
-│           ├── root.go
-│           ├── serve.go
-│           └── worker.go
+│       ├── cmd/
+│       │   ├── root.go
+│       │   ├── serve.go
+│       │   └── worker.go
+│       └── web/
 ├── configs/
-│   └── config.yaml
+│   └── config.yaml.example
+├── frontend/...
 ├── internal/
 │   ├── config/
 │   ├── database/
@@ -40,9 +46,13 @@ devopin/
 │   ├── model/
 │   ├── monitoring/
 │   ├── repository/
-│   └── services/
+│   ├── services/
+│   └── worker/
 └── pkg/
-    └── util.go
+    ├── pagination.go
+    ├── query-builder.go
+    ├── util.go
+    └── validator.go
 ```
 
 ### Key Technologies & Dependencies
@@ -88,28 +98,47 @@ go build -o devopin ./cmd/devopin
 ./devopin worker --task "example-task"
 ```
 
-#### Testing
+#### Building with Makefile
 
-Run all tests in the project:
+The project includes a Makefile for building the complete application including the frontend:
+
 ```bash
-go test ./...
+# Build the entire application (frontend + backend)
+make build_all
+
+# Clean build artifacts and frontend assets
+make clean
+
+# Build only the frontend
+make build_frontend
+
+# Build only the core backend
+make build_core_on_linux
 ```
 
 ### Configuration
 
-The application uses a YAML-based configuration system. The primary configuration file is located at `configs/config.yaml` and contains database connection settings and JWT secret:
+The application uses a YAML-based configuration system. The primary configuration file is located at `configs/config.yaml` (based on the example `configs/config.yaml.example`) and contains database connection settings and JWT secret:
 
 ```yaml
 database:
   host: "localhost"
   port: "5432"
-  user: "madina"
+  user: "postgres"
   password: ""
   dbname: "devopin"
 app:
-  jwt_secret: "1i2u12hnwjkbwuygfbe9u1n21jkn918h31ni"
+  jwt_secret: "aaaaa"
 settings:
   monitoring_interval_seconds: 10
+  alarms:
+    check_interval_seconds: 60
+    repeat_interval_minutes: 15
+    thresholds:
+      system_cpu_critical_percent: 90.0
+      system_disk_critical_percent: 85.0
+      system_mem_critical_percent: 85.0
+      worker_heartbeat_timeout_seconds: 300
 ```
 
 ### API Endpoints
@@ -118,6 +147,9 @@ The application provides REST API endpoints for:
 - Authentication (`/auth/*`)
 - User management (`/users/*`)
 - System metrics (`/system-metrics/*`)
+- Worker services (`/worker-services/*`)
+- Alarms (`/alarms/*`)
+- Docker services (`/docker/*`)
 
 ### Development Conventions
 

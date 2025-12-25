@@ -1,7 +1,10 @@
 package service
 
 import (
+	"bufio"
+	"bytes"
 	"context"
+	"encoding/binary"
 	"fmt"
 	"log"
 	"math"
@@ -13,6 +16,7 @@ import (
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/api/types/volume"
 	"github.com/docker/docker/client"
+	"github.com/docker/docker/pkg/stdcopy"
 )
 
 // DockerService handles Docker operations
@@ -148,6 +152,117 @@ func (s *DockerService) GetContainerInfo(ctx context.Context, id string) (*Conta
 		Ports:           c.Ports,
 	}
 	return &result, nil
+}
+
+func (s *DockerService) GetContainerLogs(ctx context.Context, id string, tail int) (string, error) {
+	options := container.LogsOptions{
+		ShowStdout: true,
+		ShowStderr: true,
+		Tail:       fmt.Sprintf("%d", tail),
+		Timestamps: true, // opsional: tambahin timestamp kalau mau
+	}
+
+	logsReader, err := s.client.ContainerLogs(ctx, id, options)
+	if err != nil {
+		return "", fmt.Errorf("failed to get container logs: %w", err)
+	}
+	defer logsReader.Close()
+
+	// Gunakan docker's own demux function supaya bersih
+	var stdoutBuf, stderrBuf bytes.Buffer
+	_, err = stdcopy.StdCopy(&stdoutBuf, &stderrBuf, logsReader)
+	if err != nil {
+		return "", fmt.Errorf("failed to demux logs: %w", err)
+	}
+
+	// Gabungkan stdout dan stderr (biasanya stdout sudah cukup, tapi tergantung app)
+	// Kalau mau bedain, bisa return terpisah atau tambah prefix [STDOUT]/[STDERR]
+	var result strings.Builder
+	if stdoutBuf.Len() > 0 {
+		result.WriteString(stdoutBuf.String())
+	}
+	if stderrBuf.Len() > 0 {
+		// Opsional: tambah prefix biar kelihatan ini error
+		lines := strings.Split(stderrBuf.String(), "\n")
+		for _, line := range lines {
+			if line != "" {
+				result.WriteString("[STDERR] ")
+				result.WriteString(line)
+				result.WriteString("\n")
+			}
+		}
+	}
+
+	return result.String(), nil
+}
+
+// StreamContainerLogs streams container logs in real-time
+func (s *DockerService) StreamContainerLogs(ctx context.Context, id string, lines chan<- string) error {
+	options := container.LogsOptions{
+		ShowStdout: true,
+		ShowStderr: true,
+		Follow:     true,
+		Timestamps: false, // kalau mau timestamp, bisa false kalau tidak
+		Tail:       "500", // optional: kalau mau semua historical logs dulu
+	}
+
+	logsReader, err := s.client.ContainerLogs(ctx, id, options)
+	if err != nil {
+		return fmt.Errorf("failed to get container logs: %w", err)
+	}
+
+	scanner := bufio.NewScanner(logsReader)
+	scanner.Split(func(data []byte, atEOF bool) (advance int, token []byte, err error) {
+		if len(data) < 8 {
+			return 0, nil, nil // need more data
+		}
+
+		// Read header
+		streamType := data[0] // 1 = stdout, 2 = stderr
+		size := binary.BigEndian.Uint32(data[4:8])
+
+		if len(data) < 8+int(size) {
+			return 0, nil, nil // need more data
+		}
+
+		payload := data[8 : 8+size]
+
+		// Prefix untuk distinguish stderr
+		var prefixed []byte
+		if streamType == 2 { // stderr
+			prefixed = append([]byte("[STDERR] "), payload...)
+		} else {
+			prefixed = payload
+		}
+
+		return 8 + int(size), prefixed, nil
+	})
+
+	for scanner.Scan() {
+		select {
+		case <-ctx.Done():
+			logsReader.Close()
+			return ctx.Err()
+		default:
+			line := scanner.Text()
+			if strings.TrimSpace(line) != "" {
+				select {
+				case lines <- line:
+				case <-ctx.Done():
+					logsReader.Close()
+					return ctx.Err()
+				}
+			}
+		}
+	}
+
+	if err := scanner.Err(); err != nil {
+		logsReader.Close()
+		return fmt.Errorf("error reading logs: %w", err)
+	}
+
+	logsReader.Close()
+	return nil
 }
 
 // GetImages retrieves all images
