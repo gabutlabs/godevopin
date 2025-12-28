@@ -10,6 +10,7 @@ import (
 	"math"
 	"strings"
 
+	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/image"
@@ -263,6 +264,48 @@ func (s *DockerService) StreamContainerLogs(ctx context.Context, id string, line
 
 	logsReader.Close()
 	return nil
+}
+
+func (s *DockerService) ExecInteractive(ctx context.Context, containerID string, cmd []string) (types.HijackedResponse, string, error) {
+	// Config untuk interactive shell
+	execConfig := container.ExecOptions{
+		AttachStdin:  true, // Penting untuk input
+		AttachStdout: true,
+		AttachStderr: true,
+		Tty:          true, // TTY mode - ini yang bikin interactive!
+		Cmd:          cmd,
+	}
+
+	// Create exec instance
+	execIDResp, err := s.client.ContainerExecCreate(ctx, containerID, execConfig)
+	if err != nil {
+		return types.HijackedResponse{}, "", fmt.Errorf("failed to create exec instance: %w", err)
+	}
+
+	// Attach dengan Tty=true
+	resp, err := s.client.ContainerExecAttach(ctx, execIDResp.ID, container.ExecAttachOptions{
+		Tty: true, // Penting!
+	})
+	if err != nil {
+		return types.HijackedResponse{}, "", fmt.Errorf("failed to attach to exec instance: %w", err)
+	}
+	err = s.client.ContainerExecStart(ctx, execIDResp.ID, container.ExecStartOptions{
+		Tty: true,
+	})
+	if err != nil {
+		resp.Close()
+		return types.HijackedResponse{}, "", fmt.Errorf("failed to start exec instance: %w", err)
+	}
+
+	return resp, execIDResp.ID, nil
+}
+
+// ResizeExec - untuk resize terminal
+func (s *DockerService) ResizeExec(ctx context.Context, execID string, height, width uint) error {
+	return s.client.ContainerExecResize(ctx, execID, container.ResizeOptions{
+		Height: height,
+		Width:  width,
+	})
 }
 
 // GetImages retrieves all images
