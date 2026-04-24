@@ -12,10 +12,10 @@ GOOS=$(shell go env GOOS)
 BASE_PATH := $(shell pwd)
 BUILD_PATH = $(BASE_PATH)/build
 WEB_PATH=$(BASE_PATH)/frontend
-ASSET_PATH=$(BASE_PATH)/cmd/devopin/web/dist
-CORE_MAIN=$(BASE_PATH)/cmd/devopin/main.go
+ASSET_PATH=$(BASE_PATH)/internal/web/dist
+CORE_MAIN=$(BASE_PATH)/cmd/main.go
 BUILD_NAME=godevopin
-CORE_PATH=$(BASE_PATH)/cmd/devopin
+CORE_PATH=$(BASE_PATH)/cmd
 
 # ==============================================================================
 # PHONY TARGETS
@@ -44,7 +44,7 @@ clean_assets:
 build_frontend:
 	@echo "--- Membangun frontend (pnpm install & pnpm build)..."
 	cd $(WEB_PATH) && pnpm install && pnpm build
-	cp -r $(WEB_PATH)/dist $(CORE_PATH)/web/
+	cp -r $(WEB_PATH)/dist $(BASE_PATH)/internal/web/
 
 # ==============================================================================
 # 4. TARGET BACKEND/CORE

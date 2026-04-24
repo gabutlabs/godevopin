@@ -1,16 +1,16 @@
 // cmd/nama-aplikasi/cmd/serve.go
-package cmd
+package cli
 
 import (
 	"fmt"
 	"log"
 	"strings"
 
-	"github.com/gabutlabs/devopin/cmd/devopin/web"
 	"github.com/gabutlabs/devopin/internal/config"
 	"github.com/gabutlabs/devopin/internal/database"
 	"github.com/gabutlabs/devopin/internal/handler"
 	"github.com/gabutlabs/devopin/internal/model"
+	"github.com/gabutlabs/devopin/internal/web"
 	"github.com/gofiber/fiber/v2" // Impor Fiber
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/spf13/cobra"

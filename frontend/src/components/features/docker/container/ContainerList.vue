@@ -1,6 +1,10 @@
 <template>
   <v-sheet class="pa-5">
-    <v-data-table :items="state.containers" :headers="headers">
+    <v-data-table
+      :group-by="groupBy"
+      :items="state.containers"
+      :headers="headers"
+    >
       <template #item.actions="{ item }">
         <action-table :action-items="actionMenuItems" :item="item" />
       </template>
@@ -13,14 +17,15 @@
   </v-sheet>
 </template>
 <script setup lang="ts">
-import type ActionTableVue from "@/components/ActionTable.vue";
 import router from "@/router";
 import { useDockerStore } from "@/stores/docker";
-import type { ContainerInfo, ContainerState } from "@/types/docker.type";
+import type { ContainerInfo } from "@/types/docker.type";
 import { containerStateColor } from "@/utils";
 
 const state = useDockerStore();
+const groupBy = ref<any[]>([{ key: "compose_project", order: "asc" }]);
 const headers = [
+  { key: "data-table-group", title: "Projects" },
   { title: "ID", value: "id" },
   { title: "Name", value: "name" },
   { title: "Image", value: "image" },

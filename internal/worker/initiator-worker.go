@@ -36,7 +36,7 @@ func StartWorkers(cfg *config.Config, db *gorm.DB) {
 	// --- Determine intervals from config ---
 
 	// Docker Worker
-	dockerManagement := NewDockerManagement()
+	// dockerManagement := NewDockerManagement()
 
 	// Correction: Using time.Second, not time.Minute
 	monitoringInterval := time.Duration(cfg.Settings.MonitoringIntervalSeconds) * time.Second
@@ -46,7 +46,7 @@ func StartWorkers(cfg *config.Config, db *gorm.DB) {
 	runPeriodicTask(monitWorker.StartMonitoring, monitoringInterval)
 	runPeriodicTask(hostSyncer.SyncHostServices, syncInterval)
 	runPeriodicTask(thresholdAutomation.AlarmWorker, monitoringInterval)
-	runPeriodicTask(dockerManagement.RunDocker, monitoringInterval)
+	// runPeriodicTask(dockerManagement.RunDocker, monitoringInterval)
 
 	log.Println("All workers are running. Press Ctrl+C to shut down.")
 

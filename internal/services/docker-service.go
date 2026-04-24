@@ -27,13 +27,14 @@ type DockerService struct {
 
 // ContainerInfo represents container information
 type ContainerInfo struct {
-	ID      string            `json:"id"`
-	Name    string            `json:"name"`
-	Image   string            `json:"image"`
-	Status  string            `json:"status"`
-	State   string            `json:"state"`
-	Labels  map[string]string `json:"labels"`
-	Summary container.Summary `json:"summary"`
+	ID             string            `json:"id"`
+	Name           string            `json:"name"`
+	Image          string            `json:"image"`
+	Status         string            `json:"status"`
+	State          string            `json:"state"`
+	Labels         map[string]string `json:"labels"`
+	Summary        container.Summary `json:"summary"`
+	ComposeProject string            `json:"compose_project,omitempty"`
 }
 
 type ContainerDetailInfo struct {
@@ -99,13 +100,14 @@ func (s *DockerService) GetContainers(ctx context.Context, all bool) ([]Containe
 		}
 
 		result = append(result, ContainerInfo{
-			ID:      c.ID[:12],
-			Name:    name,
-			Image:   c.Image,
-			Status:  c.Status,
-			State:   c.State,
-			Labels:  c.Labels,
-			Summary: c,
+			ID:             c.ID[:12],
+			Name:           name,
+			Image:          c.Image,
+			Status:         c.Status,
+			State:          c.State,
+			Labels:         c.Labels,
+			Summary:        c,
+			ComposeProject: c.Labels["com.docker.compose.project"],
 		})
 	}
 

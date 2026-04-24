@@ -1,5 +1,5 @@
 // cmd/nama-aplikasi/cmd/worker.go
-package cmd
+package cli
 
 import (
 	"log"
