@@ -36,25 +36,30 @@ func StartWorkers(cfg *config.Config, db *gorm.DB) {
 	settingRepo := repository.NewSettingRepository(db)
 	settingService := service.NewSettingService(settingRepo)
 
-	thresholdAutomation := NewThresholdAutomation(workerService, sysmetricService, alarmService, settingService)
+	// Log Parser Worker
+	projectRepo := repository.NewProjectRepository(db)
+	projectService := service.NewProjectService(projectRepo)
+	logHistoryRepo := repository.NewLogHistoryRepository(db)
+	logHistoryService := service.NewLogHistoryService(logHistoryRepo)
+	logParserWorker := NewLogParserWorker(projectService, logHistoryService)
+
 	// --- Determine intervals from config ---
-
-	// Docker Worker
-	// dockerManagement := NewDockerManagement()
-
-	// Fetch initial interval from DB
 	settings, err := settingService.GetSettings()
 	monitoringInterval := 10 * time.Second // fallback
 	if err == nil {
 		monitoringInterval = time.Duration(settings.MonitoringIntervalSeconds) * time.Second
 	}
 
+	thresholdAutomation := NewThresholdAutomation(workerService, sysmetricService, alarmService, settingService)
+
 	syncInterval := 5 * time.Minute // For example, sync interval is set differently
+	logParseInterval := 2 * time.Minute
 
 	// --- Run all workers as periodic goroutines ---
 	runPeriodicTask(monitWorker.StartMonitoring, monitoringInterval)
 	runPeriodicTask(hostSyncer.SyncHostServices, syncInterval)
 	runPeriodicTask(thresholdAutomation.AlarmWorker, monitoringInterval)
+	runPeriodicTask(logParserWorker.Run, logParseInterval)
 	// runPeriodicTask(dockerManagement.RunDocker, monitoringInterval)
 
 	log.Println("All workers are running. Press Ctrl+C to shut down.")

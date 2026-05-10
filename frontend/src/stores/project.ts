@@ -12,10 +12,22 @@ export type Project = {
   updated_at: string;
 };
 
+export type LogHistory = {
+  id: string;
+  project_id: number;
+  timestamp: string;
+  level: string;
+  message: string;
+  source: string;
+  created_at: string;
+};
+
 export const useProjectStore = defineStore("project", {
   state: () => ({
     projects: [] as Array<Project>,
     project: null as Project | null,
+    logs: [] as Array<LogHistory>,
+    logsTotal: 0,
     loading: false,
     action_result: { is_success: false, message: "", data: null } as {
       is_success: boolean;
@@ -24,6 +36,20 @@ export const useProjectStore = defineStore("project", {
     },
   }),
   actions: {
+    async fetchProjectLogs(id: number, page: number = 1, limit: number = 100) {
+      this.loading = true;
+      try {
+        const response = await axios.get(`/projects/${id}/logs`, {
+          params: { page, limit }
+        });
+        this.logs = response.data.data.data;
+        this.logsTotal = response.data.data.total;
+      } catch (error) {
+        console.error("Fetch project logs failed:", error);
+      } finally {
+        this.loading = false;
+      }
+    },
     async fetchAllProjects() {
       this.loading = true;
       try {

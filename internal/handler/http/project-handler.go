@@ -11,10 +11,14 @@ import (
 
 type ProjectHandler struct {
 	projectService service.ProjectService
+	logService     service.LogHistoryService
 }
 
-func NewProjectHandler(svc service.ProjectService) *ProjectHandler {
-	return &ProjectHandler{projectService: svc}
+func NewProjectHandler(svc service.ProjectService, ls service.LogHistoryService) *ProjectHandler {
+	return &ProjectHandler{
+		projectService: svc,
+		logService:     ls,
+	}
 }
 
 func (h *ProjectHandler) GetAllProjects(c *fiber.Ctx) error {
@@ -92,6 +96,29 @@ func (h *ProjectHandler) UpdateProject(c *fiber.Ctx) error {
 	return c.JSON(pkg.GenerateResponse("Project updated successfully", project))
 }
 
+func (h *ProjectHandler) GetProjectLogs(c *fiber.Ctx) error {
+	id, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(pkg.GenerateErrorResponse("Invalid project ID", nil))
+	}
+
+	page, _ := strconv.Atoi(c.Query("page", "1"))
+	limit, _ := strconv.Atoi(c.Query("limit", "100"))
+	offset := (page - 1) * limit
+
+	logs, total, err := h.logService.GetLogsByProjectID(uint(id), limit, offset)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(pkg.GenerateErrorResponse("Failed to retrieve logs", nil))
+	}
+
+	return c.JSON(pkg.GenerateResponse("Logs retrieved successfully", fiber.Map{
+		"data":  logs,
+		"total": total,
+		"page":  page,
+		"limit": limit,
+	}))
+}
+
 func (h *ProjectHandler) DeleteProject(c *fiber.Ctx) error {
 	id, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
@@ -110,4 +137,5 @@ func (h *ProjectHandler) SetupProjectRoutes(router fiber.Router) {
 	projectGroup.Get("/:id", h.GetProjectByID)
 	projectGroup.Put("/:id", h.UpdateProject)
 	projectGroup.Delete("/:id", h.DeleteProject)
+	projectGroup.Get("/:id/logs", h.GetProjectLogs)
 }

@@ -24,6 +24,7 @@ declare module 'vue-router/auto-routes' {
     '/docker/container/[id]': RouteRecordInfo<'/docker/container/[id]', '/docker/container/:id', { id: ParamValue<true> }, { id: ParamValue<false> }>,
     '/login': RouteRecordInfo<'/login', '/login', Record<never, never>, Record<never, never>>,
     '/projects/': RouteRecordInfo<'/projects/', '/projects', Record<never, never>, Record<never, never>>,
+    '/projects/[id]': RouteRecordInfo<'/projects/[id]', '/projects/:id', { id: ParamValue<true> }, { id: ParamValue<false> }>,
     '/settings': RouteRecordInfo<'/settings', '/settings', Record<never, never>, Record<never, never>>,
     '/users/': RouteRecordInfo<'/users/', '/users', Record<never, never>, Record<never, never>>,
     '/worker/': RouteRecordInfo<'/worker/', '/worker', Record<never, never>, Record<never, never>>,
@@ -62,6 +63,10 @@ declare module 'vue-router/auto-routes' {
     }
     'src/pages/projects/index.vue': {
       routes: '/projects/'
+      views: never
+    }
+    'src/pages/projects/[id].vue': {
+      routes: '/projects/[id]'
       views: never
     }
     'src/pages/settings.vue': {

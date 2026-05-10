@@ -36,6 +36,7 @@ var serveCmd = &cobra.Command{
 		if err != nil {
 			log.Fatalf("could not connect to database: %v", err)
 		}
+
 		err = db.AutoMigrate(
 			&model.User{},
 			&model.SystemMetric{},
@@ -44,6 +45,7 @@ var serveCmd = &cobra.Command{
 			&model.AlarmHistory{},
 			&model.Project{},
 			&model.AppSetting{},
+			&model.LogHistory{},
 		)
 
 		if err != nil {

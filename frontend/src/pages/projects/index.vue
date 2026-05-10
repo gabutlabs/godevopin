@@ -117,10 +117,12 @@ import { useProjectStore, type Project } from "@/stores/project";
 import useVuelidate from "@vuelidate/core";
 import { required } from "@vuelidate/validators";
 import { ref, reactive, onMounted, computed, watch } from "vue";
+import { useRouter } from "vue-router";
 
 const search = ref("");
 const dialog = ref(false);
 const state = useProjectStore();
+const router = useRouter();
 const payload = reactive({
   id: 0,
   name: "",
@@ -233,6 +235,13 @@ async function submit() {
 }
 
 const actionMenuItems = [
+  {
+    title: "View Details",
+    icon: "mdi-eye",
+    onClick: (item: Project) => {
+      router.push(`/projects/${item.id}`);
+    },
+  },
   {
     title: "Edit",
     icon: "mdi-pencil",

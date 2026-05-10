@@ -50,7 +50,9 @@ func SetupHandlers(router fiber.Router, db *gorm.DB, config *config.Config) {
 	// Setup Project routes
 	projectRepo := repository.NewProjectRepository(db)
 	projectService := service.NewProjectService(projectRepo)
-	projectHandler := http_handler.NewProjectHandler(projectService)
+	logHistoryRepo := repository.NewLogHistoryRepository(db)
+	logHistoryService := service.NewLogHistoryService(logHistoryRepo)
+	projectHandler := http_handler.NewProjectHandler(projectService, logHistoryService)
 	projectHandler.SetupProjectRoutes(router)
 
 	// Setup Setting routes
