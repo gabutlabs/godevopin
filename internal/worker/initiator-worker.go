@@ -32,14 +32,23 @@ func StartWorkers(cfg *config.Config, db *gorm.DB) {
 	// Threshold automation worker
 	alarmRepo := repository.NewAlarmRepository(db)
 	alarmService := service.NewAlarmService(alarmRepo)
-	thresholdAutomation := NewThresholdAutomation(workerService, sysmetricService, alarmService, cfg)
+
+	settingRepo := repository.NewSettingRepository(db)
+	settingService := service.NewSettingService(settingRepo)
+
+	thresholdAutomation := NewThresholdAutomation(workerService, sysmetricService, alarmService, settingService)
 	// --- Determine intervals from config ---
 
 	// Docker Worker
 	// dockerManagement := NewDockerManagement()
 
-	// Correction: Using time.Second, not time.Minute
-	monitoringInterval := time.Duration(cfg.Settings.MonitoringIntervalSeconds) * time.Second
+	// Fetch initial interval from DB
+	settings, err := settingService.GetSettings()
+	monitoringInterval := 10 * time.Second // fallback
+	if err == nil {
+		monitoringInterval = time.Duration(settings.MonitoringIntervalSeconds) * time.Second
+	}
+
 	syncInterval := 5 * time.Minute // For example, sync interval is set differently
 
 	// --- Run all workers as periodic goroutines ---

@@ -23,6 +23,7 @@ type WorkerServiceService interface {
 	DeleteWorkerService(id uint) error
 	ListWorkerServices(filters map[string]map[string]string) ([]model.WorkerService, error)
 	UpdateWorkerServiceStatus(id uint, currentStatus model.CurrentStatus, healthStatus model.HealthStatus) error
+	SyncWorkerServiceStatus(id uint, currentStatus model.CurrentStatus, healthStatus model.HealthStatus) error
 	UpdateWorkerServiceHeartbeat(id uint) error
 }
 
@@ -106,6 +107,29 @@ func (s *workerServiceService) UpdateWorkerServiceStatus(id uint, currentStatus 
 	if err != nil {
 		return err
 	}
+	return s.UpdateWorkerService(workerService)
+}
+
+// SyncWorkerServiceStatus updates the status of a WorkerService without triggering host actions
+func (s *workerServiceService) SyncWorkerServiceStatus(id uint, currentStatus model.CurrentStatus, healthStatus model.HealthStatus) error {
+	workerService, err := s.GetWorkerServiceByID(id)
+	if err != nil {
+		return err
+	}
+
+	workerService.CurrentStatus = currentStatus
+	workerService.HealthStatus = healthStatus
+
+	// Update the last status change time based on the status
+	switch currentStatus {
+	case model.StatusRunning:
+		now := time.Now()
+		workerService.LastSuccessAt = &now
+	case model.StatusFailed:
+		now := time.Now()
+		workerService.LastFailureAt = &now
+	}
+
 	return s.UpdateWorkerService(workerService)
 }
 

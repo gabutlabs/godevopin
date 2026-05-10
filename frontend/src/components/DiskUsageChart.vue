@@ -16,8 +16,10 @@
 import { ref, computed } from "vue";
 import VueApexCharts from "vue3-apexcharts";
 import type { ApexOptions } from "apexcharts";
+import { useAppStore } from "@/stores/app";
 
 // --- Props untuk menerima data dari luar ---
+const appStore = useAppStore();
 const props = defineProps({
   usage: {
     type: Number,
@@ -59,6 +61,9 @@ const series = computed(() => [props.usage, freeSpace.value]);
 // Konfigurasi lengkap untuk chart
 const chartOptions = computed(
   (): ApexOptions => ({
+    theme: {
+      mode: appStore.theme as "light" | "dark",
+    },
     chart: {
       type: "donut",
     },

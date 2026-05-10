@@ -16,6 +16,7 @@
 import { ref, watch, nextTick } from "vue";
 import VueApexCharts from "vue3-apexcharts";
 import type { ApexOptions } from "apexcharts";
+import { useAppStore } from "@/stores/app";
 
 const props = defineProps({
   // ... (props Anda yang lain tidak berubah)
@@ -33,6 +34,7 @@ const props = defineProps({
   },
 });
 
+const appStore = useAppStore();
 const series = ref<any[]>([]);
 const chartOptions = ref<ApexOptions>({});
 const isChartReady = ref(false);
@@ -76,6 +78,9 @@ async function updateChartData(newData: any[]) {
   }
 
   chartOptions.value = {
+    theme: {
+      mode: appStore.theme as "light" | "dark",
+    },
     // ... (opsi chart lainnya)
     xaxis: {
       type: "datetime",
@@ -106,6 +111,13 @@ watch(
     updateChartData(newData);
   },
   { immediate: true, deep: true }
+);
+
+watch(
+  () => appStore.theme,
+  () => {
+    updateChartData(props.data);
+  }
 );
 </script>
 

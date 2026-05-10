@@ -70,7 +70,7 @@ func (s *Syncer) SyncHostServices() {
 			log.Printf("Status for '%s' changed from '%s' to '%s'. Updating DB.",
 				existingWorker.Name, existingWorker.CurrentStatus, newStatus)
 
-			errUpdate := s.workerService.UpdateWorkerServiceStatus(existingWorker.ID, newStatus, model.HealthUnknown)
+			errUpdate := s.workerService.SyncWorkerServiceStatus(existingWorker.ID, newStatus, model.HealthUnknown)
 			if errUpdate != nil {
 				log.Printf("Failed to update status for '%s': %v", existingWorker.Name, errUpdate)
 			}

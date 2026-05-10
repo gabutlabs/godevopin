@@ -36,10 +36,39 @@ var serveCmd = &cobra.Command{
 		if err != nil {
 			log.Fatalf("could not connect to database: %v", err)
 		}
-		err = db.AutoMigrate(&model.User{}, &model.SystemMetric{}, &model.WorkerService{}, &model.ActiveAlarm{}, &model.AlarmHistory{}) // Contoh migrasi model User
+		err = db.AutoMigrate(
+			&model.User{},
+			&model.SystemMetric{},
+			&model.WorkerService{},
+			&model.ActiveAlarm{},
+			&model.AlarmHistory{},
+			&model.Project{},
+			&model.AppSetting{},
+		)
 
 		if err != nil {
 			log.Fatalf("could not migrate database: %v", err)
+		}
+
+		// Seeder untuk AppSetting
+		var count int64
+		db.Model(&model.AppSetting{}).Count(&count)
+		if count == 0 {
+			defaultSetting := model.AppSetting{
+				ID:                            1,
+				MonitoringIntervalSeconds:     10,
+				AlarmCheckIntervalSeconds:     60,
+				AlarmRepeatIntervalMinutes:    15,
+				SystemCPUCriticalPercent:      90.0,
+				SystemDiskCriticalPercent:     85.0,
+				SystemMemCriticalPercent:      85.0,
+				WorkerHeartbeatTimeoutSeconds: 300,
+			}
+			if err := db.Create(&defaultSetting).Error; err != nil {
+				log.Printf("could not seed default settings: %v", err)
+			} else {
+				fmt.Println("Default settings seeded successfully.")
+			}
 		}
 		app := fiber.New()
 		app.Use(cors.New())
@@ -120,5 +149,5 @@ var serveCmd = &cobra.Command{
 
 func init() {
 	// Menambahkan flag --port atau -p ke subcommand 'serve'
-	serveCmd.Flags().IntVarP(&port, "port", "p", 8080, "Port untuk menjalankan server web")
+	serveCmd.Flags().IntVarP(&port, "port", "p", 8000, "Port untuk menjalankan server web")
 }

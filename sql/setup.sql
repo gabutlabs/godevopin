@@ -1,7 +1,27 @@
-ALTER TABLE system_metrics ADD PRIMARY KEY (id, created_at);
-ALTER TABLE system_metrics DROP CONSTRAINT system_metrics_pkey;
-select create_hypertable('public.system_metrics', 'created_at', if_not_exists => TRUE);
-CREATE MATERIALIZED view if not exists  system_metrics_hourly
+-- ========================================================================================================
+-- 1. CLEANUP (OPSIONAL - Hapus jika sudah ada agar tidak error)
+-- ========================================================================================================
+
+-- Hapus constraint jika ada (untuk menghindari error saat membuat table)
+ALTER TABLE system_metrics DROP CONSTRAINT IF EXISTS system_metrics_pkey;
+
+-- Hapus Materialized View jika ada (agar bisa dibuat ulang)
+DROP MATERIALIZED VIEW IF EXISTS system_metrics_hourly;
+DROP MATERIALIZED VIEW IF EXISTS system_metrics_daily;
+
+-- ========================================================================================================
+-- 2. HYPERTABLE CONVERSION (Pastikan sudah menjadi Hypertable)
+-- ========================================================================================================
+
+-- Ubah table menjadi Hypertable (Chunking)
+-- Ini memecah data besar menjadi potongan-potongan kecil berdasarkan waktu
+SELECT create_hypertable('public.system_metrics', 'created_at', if_not_exists => TRUE);
+
+-- ========================================================================================================
+-- 3. CREATE AGGREGATE HOURLY (Data per Jam)
+-- ========================================================================================================
+
+CREATE MATERIALIZED VIEW if not exists  system_metrics_hourly
 WITH (timescaledb.continuous) AS
 SELECT
     -- (1) Kelompokkan waktu ke dalam interval per 1 jam

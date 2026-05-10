@@ -46,6 +46,18 @@ func SetupHandlers(router fiber.Router, db *gorm.DB, config *config.Config) {
 	dockerService := service.NewDockerService()
 	dockerHandler := http_handler.NewDockerHandler(dockerService)
 	dockerHandler.SetupDockerRoutes(router)
+
+	// Setup Project routes
+	projectRepo := repository.NewProjectRepository(db)
+	projectService := service.NewProjectService(projectRepo)
+	projectHandler := http_handler.NewProjectHandler(projectService)
+	projectHandler.SetupProjectRoutes(router)
+
+	// Setup Setting routes
+	settingRepo := repository.NewSettingRepository(db)
+	settingService := service.NewSettingService(settingRepo)
+	settingHandler := http_handler.NewSettingHandler(settingService)
+	settingHandler.SetupSettingRoutes(router)
 }
 
 func SetupSocketHandlers(wsGroup fiber.Router, db *gorm.DB, config *config.Config) {

@@ -11,7 +11,7 @@ a {
 <template>
   <v-card class="pa-4">
     <v-card-text class="pt-2">
-      <h4 class="text-h4 mb-1">Welcome to Vtify! 👋🏻</h4>
+      <h4 class="text-h4 mb-1">Welcome to Devopin! 👋🏻</h4>
       <p class="mb-0">Please sign-in to your account and start the adventure</p>
     </v-card-text>
 
@@ -23,7 +23,9 @@ a {
               label="Email"
               class="mb-2"
               v-model="formState.email"
-              :error-messages="v$.email.$errors.map((e: { $message: any; }) => e.$message)"
+              :error-messages="
+                v$.email.$errors.map((e: { $message: any }) => e.$message)
+              "
               @blur="v$.email.$touch"
               @input="v$.email.$touch"
             ></v-text-field>
@@ -35,7 +37,9 @@ a {
               autocomplete="password"
               :append-inner-icon="isPasswordVisible ? 'mdi-eye-off' : 'mdi-eye'"
               @click:append-inner="isPasswordVisible = !isPasswordVisible"
-              :error-messages="v$.password.$errors.map((e: { $message: any; }) => e.$message)"
+              :error-messages="
+                v$.password.$errors.map((e: { $message: any }) => e.$message)
+              "
               v-model="formState.password"
               @blur="v$.password.$touch"
               @input="v$.password.$touch"

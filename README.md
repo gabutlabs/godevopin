@@ -31,16 +31,31 @@ devopin/
 └── pkg/                       # Shared utility packages
 ```
 
-## Features
+## Core Features Overview
 
-- **Embedded Web Frontend**: A sleek Vue.js 3 / Vuetify single-page admin panel embedded directly into the Go binary. No extra web servers required.
-- **Log Tracing**: Parse and analyze `.log` files for specific patterns and issues with support for standard log formats.
-- **System Monitoring**: Real-time cross-platform CPU, memory, disk, and network resource monitoring.
-- **REST API & WebSockets**: Robust HTTP interface with JWT auth, and WebSocket endpoints (e.g., for real-time Docker logs).
-- **CLI Application**: Command-line interface for local operations, worker tasks, and server execution.
-- **Alarms & Alerts**: Configurable monitoring thresholds and alerting systems.
-- **Docker Services**: Built-in support to monitor and manage Docker services via websockets.
-- **Configurable & Extensible**: Modular architecture with flexible YAML configuration.
+Devopin is packed with built-in tools for holistic infrastructure management. Here is a high-level overview of the main capabilities:
+
+### 1. 📊 System Monitoring Dashboard
+Real-time and historical visualization of system performance. It tracks key metrics such as **CPU, Memory, and Disk Usage**. Data is persistently stored using **PostgreSQL with TimescaleDB** for efficient time-series querying, allowing you to filter charts from the last 1 hour up to the last 30 days with seamless auto-refresh capabilities.
+
+### 2. 🚨 Alarms & Alerts Management
+Monitors system metrics against predefined thresholds. Whenever a threshold is breached, Devopin triggers an alert. You can manage **Active** alarms (FIRING) and review the **History** of past or ACKNOWLEDGED alarms to keep your infrastructure healthy.
+
+### 3. 🐳 Docker Management
+Get full visibility into your Docker environment directly from the UI. You can monitor and manage **Containers, Images, Networks, and Volumes**. Integrated with the Docker Engine API, it provides real-time status updates via WebSockets.
+
+### 4. ⚙️ Worker Services Control Panel
+A built-in control panel to orchestrate background tasks and internal daemon processes. You can monitor the lifecycle of each worker (**Start, Stop, Restart**), track their desired state, PIDs, health status, and last heartbeats.
+
+### 5. 📝 Log Tracing Engine
+Designed to assist developers and sysadmins in analyzing `.log` files. Devopin includes a parsing engine that can extract meaningful information (Error Levels, Messages, Timestamps) from standard log formats, making it easier to trace specific issues across large log files.
+
+### 6. 🔐 User & Access Management
+A complete CRUD interface for managing user access to the Devopin dashboard. It features secure **JWT-based authentication**, role-based access control, and password hashing (bcrypt) to ensure your system monitoring is safely guarded.
+
+### 7. 🚀 Embedded Web Frontend & CLI
+- **Single Binary Deployment:** The entire Vue.js 3 / Vuetify frontend is embedded directly into the Go binary. No separate web server (like Nginx) is required to serve the UI!
+- **Cobra CLI:** Powerful command-line interface for local operations, worker task executions, and launching the server.
 
 ## Requirements
 

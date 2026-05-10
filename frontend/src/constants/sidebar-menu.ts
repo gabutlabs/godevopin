@@ -19,4 +19,14 @@ export default [
     icon: "mdi-docker",
     title: "Docker",
   },
+  {
+    link: "/projects",
+    icon: "mdi-folder-outline",
+    title: "Projects",
+  },
+  {
+    link: "/settings",
+    icon: "mdi-cog-outline",
+    title: "Settings",
+  },
 ];
