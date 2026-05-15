@@ -84,3 +84,16 @@ SELECT add_continuous_aggregate_policy('system_metrics_daily',
     end_offset   => INTERVAL '1 day',
     schedule_interval => INTERVAL '1 hour'
 );
+
+-- ========================================================================================================
+-- 4. DATA RETENTION POLICY (Hapus data yang lebih lama dari 30 hari)
+-- ========================================================================================================
+
+-- Hapus raw data di hypertable yang lebih dari 30 hari
+SELECT add_retention_policy('system_metrics', drop_after => INTERVAL '30 days', if_not_exists => true);
+
+-- Hapus data aggregasi per jam yang lebih dari 30 hari
+SELECT add_retention_policy('system_metrics_hourly', drop_after => INTERVAL '30 days', if_not_exists => true);
+
+-- Hapus data aggregasi harian yang lebih dari 30 hari
+SELECT add_retention_policy('system_metrics_daily', drop_after => INTERVAL '30 days', if_not_exists => true);
