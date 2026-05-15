@@ -13,6 +13,11 @@ type UpdateSettingRequest struct {
 	SystemDiskCriticalPercent     float64 `json:"system_disk_critical_percent"`
 	SystemMemCriticalPercent      float64 `json:"system_mem_critical_percent"`
 	WorkerHeartbeatTimeoutSeconds int     `json:"worker_heartbeat_timeout_seconds"`
+	AiProvider                    string  `json:"ai_provider"`
+	AiModelName                   string  `json:"ai_model_name"`
+	AiApiKey                      string  `json:"ai_api_key"`
+	AiBaseURL                     string  `json:"ai_base_url"`
+	TelegramBotToken              string  `json:"telegram_bot_token"`
 }
 
 type SettingService interface {
@@ -45,6 +50,11 @@ func (s *settingService) UpdateSettings(req *UpdateSettingRequest) error {
 	setting.SystemDiskCriticalPercent = req.SystemDiskCriticalPercent
 	setting.SystemMemCriticalPercent = req.SystemMemCriticalPercent
 	setting.WorkerHeartbeatTimeoutSeconds = req.WorkerHeartbeatTimeoutSeconds
+	setting.AIProvider = req.AiProvider
+	setting.AIModelName = req.AiModelName
+	setting.AIApiKey = req.AiApiKey
+	setting.AIBaseURL = req.AiBaseURL
+	setting.TelegramBotToken = req.TelegramBotToken
 
 	return s.repo.UpdateSettings(setting)
 }

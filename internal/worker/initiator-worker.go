@@ -55,12 +55,19 @@ func StartWorkers(cfg *config.Config, db *gorm.DB) {
 	syncInterval := 5 * time.Minute // For example, sync interval is set differently
 	logParseInterval := 2 * time.Minute
 
+	// Telegram AI Agent Worker
+	dockerService := service.NewDockerService()
+	telegramWorker := NewTelegramWorker(settingService, sysmetricService, workerService, dockerService, logHistoryService, projectService)
+
 	// --- Run all workers as periodic goroutines ---
 	runPeriodicTask(monitWorker.StartMonitoring, monitoringInterval)
 	runPeriodicTask(hostSyncer.SyncHostServices, syncInterval)
 	runPeriodicTask(thresholdAutomation.AlarmWorker, monitoringInterval)
 	runPeriodicTask(logParserWorker.Run, logParseInterval)
 	// runPeriodicTask(dockerManagement.RunDocker, monitoringInterval)
+
+	// Start Telegram Bot (Long Polling)
+	go telegramWorker.Start()
 
 	log.Println("All workers are running. Press Ctrl+C to shut down.")
 

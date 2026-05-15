@@ -26,7 +26,7 @@ body {
 }
 
 /* Base Radius to match Google Stitch Devopin Observability design */
-.v-card, .v-sheet, .v-text-field .v-input__control, .v-select .v-input__control {
+.v-card, .v-sheet {
   border-radius: 8px !important; /* Cards & Modals: 8px */
 }
 
@@ -40,16 +40,13 @@ body {
 }
 
 /* Forms and Inputs */
-.v-field--variant-outlined .v-field__outline__start,
-.v-field--variant-outlined .v-field__outline__end,
-.v-field--variant-outlined .v-field__outline__notch::before,
-.v-field--variant-outlined .v-field__outline__notch::after {
-  border-color: rgba(var(--v-theme-on-surface), 0.38) !important; /* Adapt to light/dark */
+.v-field--variant-outlined {
+  --v-field-border-opacity: 0.38 !important;
 }
 
 .v-field--variant-outlined.v-field--focused .v-field__outline {
   --v-field-border-opacity: 1;
-  box-shadow: 0 0 0 2px rgba(var(--v-theme-primary), 0.2) !important; /* primary color glow at 20% */
+  /* Removed box-shadow here because it ignores the notch and crosses the label */
 }
 
 /* Sidebar Navigation */

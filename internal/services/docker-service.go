@@ -374,6 +374,23 @@ func (s *DockerService) GetVolumes(ctx context.Context) ([]VolumeInfo, error) {
 	return result, nil
 }
 
+// StartContainer starts a container by ID
+func (s *DockerService) StartContainer(ctx context.Context, id string) error {
+	return s.client.ContainerStart(ctx, id, container.StartOptions{})
+}
+
+// StopContainer stops a container by ID
+func (s *DockerService) StopContainer(ctx context.Context, id string) error {
+	// Timeout 10 seconds for graceful stop
+	timeout := 10
+	return s.client.ContainerStop(ctx, id, container.StopOptions{Timeout: &timeout})
+}
+
+// RestartContainer restarts a container by ID
+func (s *DockerService) RestartContainer(ctx context.Context, id string) error {
+	return s.client.ContainerRestart(ctx, id, container.StopOptions{})
+}
+
 // GetAllResources retrieves all Docker resources at once
 func (s *DockerService) GetAllResources(ctx context.Context) (map[string]interface{}, error) {
 	containers, err := s.GetContainers(ctx, true)

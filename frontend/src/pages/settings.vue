@@ -5,8 +5,7 @@ meta:
 
 <template>
   <div>
-    <PageContent title="Application Settings">
-    </PageContent>
+    <PageContent title="Application Settings"> </PageContent>
 
     <v-container class="mt-4">
       <v-row>
@@ -100,6 +99,64 @@ meta:
                       persistent-hint
                     ></v-text-field>
                   </v-col>
+
+                  <v-col cols="12">
+                    <v-divider class="my-4"></v-divider>
+                    <div class="text-subtitle-1 mb-2">
+                      AI & Telegram Configuration
+                    </div>
+                  </v-col>
+
+                  <v-col cols="12">
+                    <v-text-field
+                      v-model="form.telegram_bot_token"
+                      label="Telegram Bot Token"
+                      placeholder="e.g. 123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11"
+                      variant="outlined"
+                      persistent-hint
+                    ></v-text-field>
+                  </v-col>
+
+                  <v-col cols="12" sm="6">
+                    <v-select
+                      v-model="form.ai_provider"
+                      :items="['gemini', 'openai', 'huggingface', 'custom']"
+                      label="AI Provider"
+                      variant="outlined"
+                    ></v-select>
+                  </v-col>
+
+                  <v-col cols="12" sm="6">
+                    <v-text-field
+                      v-model="form.ai_model_name"
+                      label="AI Model Name"
+                      placeholder="e.g. gemini-1.5-flash, gpt-4, etc."
+                      variant="outlined"
+                    ></v-text-field>
+                  </v-col>
+
+                  <v-col cols="12">
+                    <v-text-field
+                      v-model="form.ai_api_key"
+                      label="AI API Key"
+                      type="password"
+                      variant="outlined"
+                    ></v-text-field>
+                  </v-col>
+
+                  <v-col
+                    cols="12"
+                    v-if="['custom', 'huggingface'].includes(form.ai_provider)"
+                  >
+                    <v-text-field
+                      v-model="form.ai_base_url"
+                      :label="`${form.ai_provider.toUpperCase()} API Base URL`"
+                      placeholder="http://localhost:11434/v1"
+                      variant="outlined"
+                      hint="Base URL for OpenAI-compatible local AI (Ollama, vLLM, etc.)"
+                      persistent-hint
+                    ></v-text-field>
+                  </v-col>
                 </v-row>
               </v-form>
             </v-card-text>
@@ -133,10 +190,18 @@ meta:
             <v-card-title>Information</v-card-title>
             <v-card-text>
               <p class="text-body-2 mb-4">
-                These settings control the behavior of the monitoring system and background workers.
+                These settings control the behavior of the monitoring system and
+                background workers.
               </p>
               <p class="text-caption text-medium-emphasis">
-                Last updated: {{ settingStore.settings?.updated_at ? new Date(settingStore.settings.updated_at).toLocaleString() : 'Never' }}
+                Last updated:
+                {{
+                  settingStore.settings?.updated_at
+                    ? new Date(
+                        settingStore.settings.updated_at,
+                      ).toLocaleString()
+                    : "Never"
+                }}
               </p>
             </v-card-text>
           </v-card>
@@ -147,7 +212,7 @@ meta:
 </template>
 
 <script lang="ts" setup>
-import { reactive, onMounted, watch } from 'vue';
+import { reactive, onMounted, watch } from "vue";
 import { useAppStore } from "@/stores/app";
 import { useSettingStore, type UpdateSettingRequest } from "@/stores/setting";
 import PageContent from "@/components/PageContent.vue";
@@ -163,17 +228,34 @@ const form = reactive<UpdateSettingRequest>({
   system_disk_critical_percent: 85.0,
   system_mem_critical_percent: 85.0,
   worker_heartbeat_timeout_seconds: 300,
+  telegram_bot_token: "",
+  ai_provider: "gemini",
+  ai_model_name: "gemini-1.5-flash",
+  ai_api_key: "",
+  ai_base_url: "",
 });
 
 const loadForm = () => {
   if (settingStore.settings) {
-    form.monitoring_interval_seconds = settingStore.settings.monitoring_interval_seconds;
-    form.alarm_check_interval_seconds = settingStore.settings.alarm_check_interval_seconds;
-    form.alarm_repeat_interval_minutes = settingStore.settings.alarm_repeat_interval_minutes;
-    form.system_cpu_critical_percent = settingStore.settings.system_cpu_critical_percent;
-    form.system_disk_critical_percent = settingStore.settings.system_disk_critical_percent;
-    form.system_mem_critical_percent = settingStore.settings.system_mem_critical_percent;
-    form.worker_heartbeat_timeout_seconds = settingStore.settings.worker_heartbeat_timeout_seconds;
+    form.monitoring_interval_seconds =
+      settingStore.settings.monitoring_interval_seconds;
+    form.alarm_check_interval_seconds =
+      settingStore.settings.alarm_check_interval_seconds;
+    form.alarm_repeat_interval_minutes =
+      settingStore.settings.alarm_repeat_interval_minutes;
+    form.system_cpu_critical_percent =
+      settingStore.settings.system_cpu_critical_percent;
+    form.system_disk_critical_percent =
+      settingStore.settings.system_disk_critical_percent;
+    form.system_mem_critical_percent =
+      settingStore.settings.system_mem_critical_percent;
+    form.worker_heartbeat_timeout_seconds =
+      settingStore.settings.worker_heartbeat_timeout_seconds;
+    form.telegram_bot_token = settingStore.settings.telegram_bot_token;
+    form.ai_provider = settingStore.settings.ai_provider;
+    form.ai_model_name = settingStore.settings.ai_model_name;
+    form.ai_api_key = settingStore.settings.ai_api_key;
+    form.ai_base_url = settingStore.settings.ai_base_url;
   }
 };
 
@@ -182,9 +264,13 @@ onMounted(async () => {
   loadForm();
 });
 
-watch(() => settingStore.settings, () => {
-  loadForm();
-}, { deep: true });
+watch(
+  () => settingStore.settings,
+  () => {
+    loadForm();
+  },
+  { deep: true },
+);
 
 const saveSettings = async () => {
   await settingStore.updateSettings({ ...form });

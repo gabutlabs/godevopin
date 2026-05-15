@@ -11,6 +11,11 @@ export type AppSetting = {
   system_disk_critical_percent: number;
   system_mem_critical_percent: number;
   worker_heartbeat_timeout_seconds: number;
+  telegram_bot_token: string;
+  ai_provider: string;
+  ai_model_name: string;
+  ai_api_key: string;
+  ai_base_url: string;
   updated_at: string;
 };
 
