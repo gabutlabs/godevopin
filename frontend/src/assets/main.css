@@ -1,0 +1,91 @@
+/* DevOpin Design System CSS overrides */
+
+body {
+  font-family: 'Inter', sans-serif;
+  letter-spacing: normal;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Typography Overrides */
+.text-h1, .text-h2, .text-h3, .text-h4, .text-h5, .text-h6 {
+  font-family: 'Inter', sans-serif !important;
+  font-weight: 600;
+  letter-spacing: -0.01em !important;
+}
+
+.text-h4 {
+  font-size: 24px !important;
+  line-height: 32px !important;
+}
+
+.v-btn {
+  font-family: 'Inter', sans-serif !important;
+  text-transform: none !important;
+  font-weight: 500;
+  letter-spacing: normal;
+}
+
+/* Base Radius to match Google Stitch Devopin Observability design */
+.v-card, .v-sheet, .v-text-field .v-input__control, .v-select .v-input__control {
+  border-radius: 8px !important; /* Cards & Modals: 8px */
+}
+
+.v-btn {
+  border-radius: 4px !important; /* Buttons & Inputs: 4px */
+}
+
+.v-chip {
+  border-radius: 9999px !important; /* Status Tags: fully rounded */
+  font-weight: 600;
+}
+
+/* Forms and Inputs */
+.v-field--variant-outlined .v-field__outline__start,
+.v-field--variant-outlined .v-field__outline__end,
+.v-field--variant-outlined .v-field__outline__notch::before,
+.v-field--variant-outlined .v-field__outline__notch::after {
+  border-color: rgba(var(--v-theme-on-surface), 0.38) !important; /* Adapt to light/dark */
+}
+
+.v-field--variant-outlined.v-field--focused .v-field__outline {
+  --v-field-border-opacity: 1;
+  box-shadow: 0 0 0 2px rgba(var(--v-theme-primary), 0.2) !important; /* primary color glow at 20% */
+}
+
+/* Sidebar Navigation */
+.v-navigation-drawer .v-list-item--active {
+  border-left: 3px solid rgb(var(--v-theme-primary)) !important;
+  background: rgba(var(--v-theme-primary), 0.08); /* slight primary background */
+}
+
+/* Data Tables */
+.v-data-table > .v-table__wrapper > table > tbody > tr:nth-child(odd) {
+  background: rgba(var(--v-theme-on-surface), 0.03) !important; /* Zebra striping 3% */
+}
+.v-data-table > .v-table__wrapper > table > tbody > tr > td {
+  padding-top: 8px !important;
+  padding-bottom: 8px !important;
+  height: auto !important;
+}
+.v-data-table > .v-table__wrapper > table > thead > tr > th {
+  font-weight: 600 !important;
+}
+
+/* Monospaced fields */
+.text-mono {
+  font-family: 'JetBrains Mono', monospace !important;
+  font-size: 14px;
+}
+
+.v-data-table code {
+  font-family: 'JetBrains Mono', monospace !important;
+}
+
+/* Elevations - Layering */
+.v-card {
+  border: 1px solid rgba(var(--v-theme-on-surface), 0.12) !important; /* dynamic level 1 border */
+  box-shadow: none !important;
+}
+.v-card--elevated {
+  box-shadow: 0px 4px 12px rgba(0,0,0,0.1) !important; /* Level 2 Modals */
+}

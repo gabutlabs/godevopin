@@ -5,11 +5,7 @@ meta:
 
 <template>
   <div>
-    <v-toolbar
-      density="comfortable"
-      :color="state.theme == 'light' ? 'white' : '#2C303A'"
-      title="Dashboard"
-    >
+    <PageContent title="Dashboard">
       <template #append>
         <div class="d-flex ga-3 mx-4 align-center">
           <v-select
@@ -19,6 +15,7 @@ meta:
             style="min-width: 180px"
             hide-details
             v-model="selectFilter"
+            variant="outlined"
           ></v-select>
           <v-btn
             :prepend-icon="autoRefresh.icon.value"
@@ -31,36 +28,35 @@ meta:
           </v-btn>
         </div>
       </template>
-    </v-toolbar>
-    <br />
-    <v-row>
-      <v-col cols="12">
-        <DiskUsageChart
-          :usage="widgetState.diskUsage.disk_usage_byte"
-          :total="widgetState.diskUsage.disk_total_byte"
-        />
-      </v-col>
-      <v-col cols="12">
-        <WidgetLineChart
-          :data="widgetState.filteredMetrics ?? []"
-          title="CPU Usage"
-          data-key="avg_cpu_usage"
-          series-name="CPU (%)"
-          unit="%"
-          :filter-range="selectFilter"
-        />
-      </v-col>
-      <v-col cols="12">
-        <WidgetLineChart
-          :data="widgetState.filteredMetrics ?? []"
-          title="Memory Usage"
-          data-key="avg_mem_usage"
-          series-name="Memory (MiB)"
-          unit="MiB"
-          :filter-range="selectFilter"
-        />
-      </v-col>
-    </v-row>
+      <v-row>
+        <v-col cols="12">
+          <DiskUsageChart
+            :usage="widgetState.diskUsage.disk_usage_byte"
+            :total="widgetState.diskUsage.disk_total_byte"
+          />
+        </v-col>
+        <v-col cols="12">
+          <WidgetLineChart
+            :data="widgetState.filteredMetrics ?? []"
+            title="CPU Usage"
+            data-key="avg_cpu_usage"
+            series-name="CPU (%)"
+            unit="%"
+            :filter-range="selectFilter"
+          />
+        </v-col>
+        <v-col cols="12">
+          <WidgetLineChart
+            :data="widgetState.filteredMetrics ?? []"
+            title="Memory Usage"
+            data-key="avg_mem_usage"
+            series-name="Memory (MiB)"
+            unit="MiB"
+            :filter-range="selectFilter"
+          />
+        </v-col>
+      </v-row>
+    </PageContent>
   </div>
 </template>
 
@@ -70,6 +66,7 @@ import { useAppStore } from "@/stores/app";
 import { useWidgetStore } from "@/stores/widget";
 import WidgetLineChart from "@/components/WidgetLineChart.vue";
 import DiskUsageChart from "@/components/DiskUsageChart.vue";
+import PageContent from "@/components/PageContent.vue";
 
 // --- State untuk UI ---
 const selectFilter = ref("1h");

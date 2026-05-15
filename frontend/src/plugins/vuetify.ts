@@ -65,22 +65,27 @@ const lightTheme: ThemeDefinition = {
 const darkTheme: ThemeDefinition = {
   dark: true,
   colors: {
-    background: "#1F222A", // Background abu-abu gelap kebiruan yang modern
-    surface: "#2C303A", // Warna card yang sedikit lebih terang dari background
-    primary: "#536DFE", // Warna primary tetap cerah untuk kontras yang baik
-    "primary-darken-1": "#3D5AFE",
-    secondary: "#00BFA5", // Warna sekunder juga tetap cerah
-    "secondary-darken-1": "#00897B",
-    error: "#FF5252", // Warna error, success, dll dibuat lebih terang
-    info: "#29B6F6",
-    success: "#66BB6A",
-    warning: "#FFC107",
+    background: "#0b1326",
+    surface: "#0b1326",
+    "surface-bright": "#31394d",
+    "surface-variant": "#2d3449",
+    primary: "#adc6ff",
+    "primary-darken-1": "#4d8eff", // Using primary-container
+    secondary: "#b7c8e1",
+    "secondary-darken-1": "#3a4a5f", // Using secondary-container
+    error: "#ffb4ab",
+    info: "#adc6ff",
+    success: "#b7c8e1",
+    warning: "#ffb786",
 
-    // Warna teks & ikon
-    "on-surface": "#EAEAEA",
-    "on-background": "#EAEAEA",
-    "on-primary": "#FFFFFF",
-    "on-secondary": "#FFFFFF",
+    // Text & Icon Colors
+    "on-surface": "#dae2fd",
+    "on-surface-variant": "#c2c6d6",
+    "on-background": "#dae2fd",
+    "on-primary": "#002e6a",
+    "on-secondary": "#213145",
+    "on-error": "#690005",
+    "on-warning": "#502400",
   },
   variables: {
     "border-color": "#FFFFFF",

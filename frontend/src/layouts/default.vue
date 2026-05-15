@@ -1,19 +1,8 @@
-<style scoped>
-:deep(.v-overlay__content) {
-  --v-overlay-anchor-origin: bottom right !important;
-  transform-origin: right top !important;
-  top: 60px !important;
-  left: 1306px !important;
-  min-width: 40px !important;
-  max-width: 1446px !important;
-  max-height: 403px !important;
-}
-</style>
 <template>
   <v-layout>
-    <v-app-bar elevation="1">
+    <v-app-bar elevation="0" border="b" class="bg-surface">
       <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
-      <v-app-bar-title text="Godevopin Admin" />
+      <v-app-bar-title class="font-weight-bold" text="Devopin" />
       <div class="d-flex gap-2 mx-4 align-center">
         <v-btn icon @click="() => router.push('/alarms')">
           <v-badge
@@ -31,7 +20,7 @@
         </v-btn>
         <v-menu>
           <template v-slot:activator="{ props }">
-            <v-avatar color="red" v-bind="props">
+            <v-avatar color="red" v-bind="props" size="35">
               <span class="text-h5">CJ</span>
             </v-avatar>
           </template>
@@ -59,7 +48,7 @@
       </div>
     </v-app-bar>
 
-    <v-navigation-drawer v-model="drawer">
+    <v-navigation-drawer v-model="drawer" width="260" elevation="0" border="r">
       <v-list nav>
         <template v-for="v in sidebarMenu">
           <v-list-item
@@ -73,15 +62,19 @@
               route.fullPath.startsWith(v.link + '/')
             "
             :to="v.link"
-            color="#536DFE"
+            color="primary"
           >
           </v-list-item>
         </template>
       </v-list>
     </v-navigation-drawer>
 
-    <v-main>
-      <v-container class="overflow-y-auto" max-height="90vh">
+    <v-main class="bg-background">
+      <v-container
+        fluid
+        class="px-md-6 px-4 py-6 overflow-y-auto"
+        style="max-width: 1600px"
+      >
         <router-view />
       </v-container>
     </v-main>

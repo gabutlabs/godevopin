@@ -5,12 +5,8 @@ meta:
 
 <template>
   <div>
-    <v-toolbar
-      density="comfortable"
-      :color="appStore.theme == 'light' ? 'white' : '#2C303A'"
-      title="Application Settings"
-    >
-    </v-toolbar>
+    <PageContent title="Application Settings">
+    </PageContent>
 
     <v-container class="mt-4">
       <v-row>
@@ -112,7 +108,7 @@ meta:
               <v-spacer></v-spacer>
               <v-btn
                 color="primary"
-                variant="elevated"
+                variant="flat"
                 @click="saveSettings"
                 :loading="settingStore.loading"
                 prepend-icon="mdi-content-save"
@@ -154,6 +150,7 @@ meta:
 import { reactive, onMounted, watch } from 'vue';
 import { useAppStore } from "@/stores/app";
 import { useSettingStore, type UpdateSettingRequest } from "@/stores/setting";
+import PageContent from "@/components/PageContent.vue";
 
 const appStore = useAppStore();
 const settingStore = useSettingStore();

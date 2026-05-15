@@ -2,7 +2,7 @@
 <template>
   <page-content title="Projects">
     <template #append>
-      <v-btn prepend-icon="mdi-plus" variant="outlined" @click="openAddDialog"
+      <v-btn prepend-icon="mdi-plus" variant="flat" color="primary" @click="openAddDialog"
         >Add Project</v-btn
       >
     </template>
@@ -13,6 +13,7 @@
           class="ma-2"
           density="compact"
           placeholder="Search project..."
+          variant="outlined"
           width="30%"
         ></v-text-field>
         <v-data-table :items="filteredProjects" :headers="headers" :loading="state.loading">
@@ -102,7 +103,7 @@
                 </v-alert>
               </v-col>
             </v-row>
-            <v-btn class="mt-4" type="submit" block variant="elevated"
+            <v-btn class="mt-4" type="submit" block variant="flat" color="primary"
               >Submit</v-btn
             >
           </v-form>

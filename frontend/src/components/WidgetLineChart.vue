@@ -78,6 +78,9 @@ async function updateChartData(newData: any[]) {
   }
 
   chartOptions.value = {
+    chart: {
+      background: "transparent",
+    },
     theme: {
       mode: appStore.theme as "light" | "dark",
     },

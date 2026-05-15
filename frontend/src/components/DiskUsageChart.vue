@@ -66,6 +66,7 @@ const chartOptions = computed(
     },
     chart: {
       type: "donut",
+      background: "transparent",
     },
     // Label untuk setiap irisan
     labels: ["Ruang Digunakan", "Ruang Kosong"],

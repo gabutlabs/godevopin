@@ -2,13 +2,14 @@
   <page-content title="Docker Management">
     <template #append>
       <v-btn
-        variant="outlined"
+        variant="flat"
+        color="primary"
         icon="mdi-refresh"
         size="small"
         @click="refreshData"
       ></v-btn>
     </template>
-    <v-sheet elevation="4">
+    <v-card>
       <v-tabs color="primary" v-model="tab">
         <v-tab value="container">Container</v-tab>
         <v-tab value="images">Images</v-tab>
@@ -40,7 +41,7 @@
           </v-lazy>
         </v-tabs-window-item>
       </v-tabs-window>
-    </v-sheet>
+    </v-card>
   </page-content>
 </template>
 <script setup lang="ts">
