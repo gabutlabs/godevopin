@@ -49,12 +49,12 @@
               </v-col>
               <v-col cols="12">
                 <v-text-field
-                  v-model="payload.path"
-                  label="Path (e.g. /home/user/project)"
-                  :error-messages="v$.path.$errors.map((e: any) => e.$message)"
-                  @blur="v$.path.$touch"
-                  @input="v$.path.$touch"
-                  hint="Absolute path to the project directory"
+                  v-model="payload.path_log"
+                  label="Log Path (e.g. /home/user/project)"
+                  :error-messages="v$.path_log.$errors.map((e: any) => e.$message)"
+                  @blur="v$.path_log.$touch"
+                  @input="v$.path_log.$touch"
+                  hint="Absolute path to the log file or directory"
                   persistent-hint
                 ></v-text-field>
               </v-col>
@@ -126,7 +126,7 @@ const router = useRouter();
 const payload = reactive({
   id: 0,
   name: "",
-  path: "",
+  path_log: "",
   project_type: "laravel",
   log_format: "",
   is_updated: false,
@@ -180,7 +180,7 @@ function parseLogFormat(format: string) {
 const notify = useNotify();
 const rules = {
   name: { required },
-  path: { required },
+  path_log: { required },
   project_type: { required },
 };
 const v$ = useVuelidate(rules, payload);
@@ -193,7 +193,7 @@ const filteredProjects = computed(() => {
 function openAddDialog() {
   payload.id = 0;
   payload.name = "";
-  payload.path = "";
+  payload.path_log = "";
   payload.project_type = "laravel";
   payload.log_format = "";
   payload.is_updated = false;
@@ -209,7 +209,7 @@ async function submit() {
   
   const submitPayload = {
     name: payload.name,
-    path: payload.path,
+    path_log: payload.path_log,
     project_type: payload.project_type,
     log_format: payload.log_format
   };
@@ -248,7 +248,7 @@ const actionMenuItems = [
     onClick: (item: Project) => {
       payload.id = item.id;
       payload.name = item.name;
-      payload.path = item.path;
+      payload.path_log = item.path_log;
       payload.project_type = item.project_type;
       payload.log_format = item.log_format;
       payload.is_updated = true;
@@ -276,7 +276,7 @@ const actionMenuItems = [
 
 const headers = [
   { title: "Name", value: "name" },
-  { title: "Path", value: "path" },
+  { title: "Log Path", value: "path_log" },
   { title: "Type", value: "project_type" },
   { title: "Created At", value: "created_at" },
   { title: "Actions", value: "actions", sortable: false },

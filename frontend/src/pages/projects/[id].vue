@@ -34,9 +34,9 @@ meta:
                   }}</v-chip>
                 </v-col>
                 <v-col cols="12" md="6">
-                  <div class="text-caption text-medium-emphasis">Path</div>
+                  <div class="text-caption text-medium-emphasis">Log Path</div>
                   <div class="text-body-2 font-weight-medium">
-                    {{ projectStore.project.path }}
+                    {{ projectStore.project.path_log }}
                   </div>
                 </v-col>
               </v-row>
@@ -116,7 +116,7 @@ const router = useRouter();
 const projectStore = useProjectStore();
 const appStore = useAppStore();
 
-const id = Number(route.params?.id);
+const id = Number((route.params as any).id);
 const itemsPerPage = ref(50);
 
 const headers = [

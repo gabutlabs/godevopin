@@ -44,7 +44,7 @@ func (h *ProjectHandler) GetProjectByID(c *fiber.Ctx) error {
 func (h *ProjectHandler) CreateProject(c *fiber.Ctx) error {
 	type CreateProjectRequest struct {
 		Name        string `json:"name" validate:"required,min=2"`
-		Path        string `json:"path" validate:"required"`
+		PathLog     string `json:"path_log" validate:"required"`
 		ProjectType string `json:"project_type" validate:"required"`
 		LogFormat   string `json:"log_format"`
 	}
@@ -57,7 +57,7 @@ func (h *ProjectHandler) CreateProject(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(pkg.GenerateErrorResponse("Validation failed", errors))
 	}
 
-	if err := h.projectService.CreateProject(req.Name, req.Path, req.ProjectType, req.LogFormat); err != nil {
+	if err := h.projectService.CreateProject(req.Name, req.PathLog, req.ProjectType, req.LogFormat); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(pkg.GenerateErrorResponse("Failed to create project", nil))
 	}
 	return c.Status(fiber.StatusCreated).JSON(pkg.GenerateResponse("Project created successfully", nil))
@@ -66,7 +66,7 @@ func (h *ProjectHandler) CreateProject(c *fiber.Ctx) error {
 func (h *ProjectHandler) UpdateProject(c *fiber.Ctx) error {
 	type UpdateProjectRequest struct {
 		Name        string `json:"name" validate:"required,min=2"`
-		Path        string `json:"path" validate:"required"`
+		PathLog     string `json:"path_log" validate:"required"`
 		ProjectType string `json:"project_type" validate:"required"`
 		LogFormat   string `json:"log_format"`
 	}
@@ -86,7 +86,7 @@ func (h *ProjectHandler) UpdateProject(c *fiber.Ctx) error {
 	project := &model.Project{
 		ID:          uint(id),
 		Name:        req.Name,
-		Path:        req.Path,
+		PathLog:     req.PathLog,
 		ProjectType: req.ProjectType,
 		LogFormat:   req.LogFormat,
 	}

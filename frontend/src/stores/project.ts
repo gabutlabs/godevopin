@@ -5,7 +5,7 @@ import { defineStore } from "pinia";
 export type Project = {
   id: number;
   name: string;
-  path: string;
+  path_log: string;
   project_type: string;
   log_format: string;
   created_at: string;

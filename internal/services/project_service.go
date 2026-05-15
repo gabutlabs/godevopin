@@ -6,7 +6,7 @@ import (
 )
 
 type ProjectService interface {
-	CreateProject(name, path, projectType, logFormat string) error
+	CreateProject(name, pathLog, projectType, logFormat string) error
 	GetProjectByID(id uint) (*model.Project, error)
 	ListProjects() ([]model.Project, error)
 	UpdateProject(project *model.Project) error
@@ -21,10 +21,10 @@ func NewProjectService(repo repository.ProjectRepository) ProjectService {
 	return &projectService{repository: repo}
 }
 
-func (s *projectService) CreateProject(name, path, projectType, logFormat string) error {
+func (s *projectService) CreateProject(name, pathLog, projectType, logFormat string) error {
 	project := &model.Project{
 		Name:        name,
-		Path:        path,
+		PathLog:     pathLog,
 		ProjectType: projectType,
 		LogFormat:   logFormat,
 	}

@@ -35,14 +35,14 @@ func (w *LogParserWorker) Run() {
 	}
 
 	for _, project := range projects {
-		if project.Path == "" {
+		if project.PathLog == "" {
 			continue
 		}
 
 		// Find .log files in project path
-		files, err := w.findLogFiles(project.Path)
+		files, err := w.findLogFiles(project.PathLog)
 		if err != nil {
-			log.Printf("Worker [LogParser]: failed to find log files in %s: %v", project.Path, err)
+			log.Printf("Worker [LogParser]: failed to find log files in %s: %v", project.PathLog, err)
 			continue
 		}
 
