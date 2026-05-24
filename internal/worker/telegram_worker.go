@@ -103,7 +103,6 @@ func (w *TelegramWorker) Start() {
 
 		// Send "typing..." action
 		c.Notify(telebot.Typing)
-		fmt.Println("TelegramWorker: received message: %s", userMsg)
 		resp, err := agent.Chat(context.Background(), userMsg)
 		if err != nil {
 			log.Printf("TelegramWorker: agent error: %v", err)
