@@ -78,11 +78,21 @@ app:
   jwt_secret: "your-secure-secret"
 ```
 
-## Building and Running
+## Installation
+
+You can install Devopin either by downloading the pre-built binaries from GitHub Releases or by building it from source.
+
+### 1. Download from GitHub Releases (Recommended)
+
+Pre-built binaries are available for Linux, macOS, and Windows.
+1. Go to the [Releases page](https://github.com/gabutlabs/devopin/releases) of this repository.
+2. Download the appropriate binary for your operating system and architecture.
+3. Make the binary executable (Linux/macOS): `chmod +x godevopin-*`
+4. Run the application: `./godevopin-* serve`
+
+### 2. Build from Source
 
 Devopin includes a comprehensive `Makefile` to handle building both the frontend and backend.
-
-### Development Build
 
 To build the entire application (compiles the Vue frontend and embeds it into the Go backend):
 
@@ -92,7 +102,7 @@ make build_all
 
 To build just the backend or frontend:
 ```bash
-make build_core_on_linux
+make build_core
 make build_frontend
 ```
 
