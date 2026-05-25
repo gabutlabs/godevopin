@@ -21,7 +21,7 @@ CORE_PATH=$(BASE_PATH)/cmd
 # PHONY TARGETS
 # Menghindari bentrokan jika ada file dengan nama yang sama (mis. "all", "clean")
 # ==============================================================================
-.PHONY: all clean clean_assets build_frontend build_core_on_linux build_core_on_darwin build_all
+.PHONY: all clean clean_assets build_frontend build_core build_core_linux build_all
 
 # ==============================================================================
 # 1. TARGET DEFAULT
@@ -32,7 +32,7 @@ all: build_all
 # ==============================================================================
 # 2. TARGET BUILD KESELURUHAN (Menggantikan build_all Anda)
 # ==============================================================================
-build_all: clean_assets build_frontend build_core_on_linux # Menghapus build_agent_on_linux karena rule-nya tidak didefinisikan
+build_all: clean_assets build_frontend build_core
 
 # ==============================================================================
 # 3. TARGET FRONTEND
@@ -50,12 +50,12 @@ build_frontend:
 # 4. TARGET BACKEND/CORE
 # ==============================================================================
 # Build untuk OS/Arsitektur yang sedang berjalan (Linux jika di Linux, Darwin jika di Darwin, dst.)
-build_core_on_linux:
+build_core:
 	@echo "--- Membangun Core Go untuk $(GOOS)/$(GOARCH)..."
 	GOOS=$(GOOS) GOARCH=$(GOARCH) $(GOBUILD) -trimpath -ldflags '-s -w' -o $(BUILD_PATH)/$(BUILD_NAME) $(CORE_MAIN)
 
 # Target terpisah jika perlu kompilasi silang (cross-compile) ke Linux dari Mac/Windows
-build_core_on_darwin:
+build_core_linux:
 	@echo "--- Cross-compiling Core Go ke Linux/AMD64..."
 	GOOS=linux GOARCH=amd64 $(GOBUILD) -trimpath -ldflags '-s -w' -o $(BUILD_PATH)/$(BUILD_NAME)_linux_amd64 $(CORE_MAIN)
 

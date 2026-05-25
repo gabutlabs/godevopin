@@ -1,0 +1,61 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-and-release:
+    name: Build and Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.0'
+
+      - name: Build Frontend
+        run: make build_frontend
+
+      - name: Create Build Directory
+        run: mkdir -p build
+
+      - name: Build for Linux (amd64)
+        run: GOOS=linux GOARCH=amd64 go build -trimpath -ldflags '-s -w' -o build/godevopin-linux-amd64 ./cmd/main.go
+
+      - name: Build for Linux (arm64)
+        run: GOOS=linux GOARCH=arm64 go build -trimpath -ldflags '-s -w' -o build/godevopin-linux-arm64 ./cmd/main.go
+
+      - name: Build for Windows (amd64)
+        run: GOOS=windows GOARCH=amd64 go build -trimpath -ldflags '-s -w' -o build/godevopin-windows-amd64.exe ./cmd/main.go
+
+      - name: Build for macOS (amd64)
+        run: GOOS=darwin GOARCH=amd64 go build -trimpath -ldflags '-s -w' -o build/godevopin-darwin-amd64 ./cmd/main.go
+
+      - name: Build for macOS (arm64)
+        run: GOOS=darwin GOARCH=arm64 go build -trimpath -ldflags '-s -w' -o build/godevopin-darwin-arm64 ./cmd/main.go
+
+      - name: Publish Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build/*
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
