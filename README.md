@@ -82,13 +82,37 @@ app:
 
 You can install Devopin either by downloading the pre-built binaries from GitHub Releases or by building it from source.
 
-### 1. Download from GitHub Releases (Recommended)
+### 1. Auto-Installation Script (Recommended for Linux/macOS)
+
+The easiest way to install Devopin globally on your system is by using the automatic installer script. This will download the latest binary, install it to `/usr/local/bin`, and set up the global configuration directory at `/opt/devopin/`.
+
+```bash
+curl -sSL https://raw.githubusercontent.com/gabutlabs/devopin/main/install.sh | bash
+```
+
+After installation, you can simply run:
+```bash
+devopin serve
+```
+
+### 2. Download from GitHub Releases (Manual)
 
 Pre-built binaries are available for Linux, macOS, and Windows.
+
+**Option A: Download via Web Browser**
 1. Go to the [Releases page](https://github.com/gabutlabs/devopin/releases) of this repository.
 2. Download the appropriate binary for your operating system and architecture.
-3. Make the binary executable (Linux/macOS): `chmod +x godevopin-*`
-4. Run the application: `./godevopin-* serve`
+
+**Option B: Download via CLI (curl)**
+You can also download the binary directly from the terminal. For example, to download the `linux-arm64` binary for version `v0.2.0-beta`:
+```bash
+curl -L -o devopin https://github.com/gabutlabs/devopin/releases/download/v0.2.0-beta/godevopin-linux-arm64
+```
+*(Make sure to adjust the version and architecture to match your needs)*
+
+**After downloading manually (both options):**
+1. Make the binary executable (Linux/macOS): `chmod +x devopin`
+2. Run the application: `./devopin serve`
 
 ### 2. Build from Source
 

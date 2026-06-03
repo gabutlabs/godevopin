@@ -22,9 +22,14 @@ type DBConfig struct {
 
 // LoadConfig membaca konfigurasi dari file atau environment variables.
 func LoadConfig() (config Config, err error) {
-	viper.AddConfigPath("./configs") // Path ke file config
-	viper.SetConfigName("config")    // Nama file (tanpa ekstensi)
-	viper.SetConfigType("yaml")      // Tipe file
+	viper.AddConfigPath("./configs")             // Path lokal untuk development
+	viper.AddConfigPath(".")                     // Direktori saat ini
+	viper.AddConfigPath("/opt/devopin")          // Path instalasi global (Linux/macOS)
+	viper.AddConfigPath("/etc/devopin")          // Path konfigurasi global
+	viper.AddConfigPath("$HOME/.config/devopin") // Path konfigurasi user
+
+	viper.SetConfigName("config")                // Nama file (tanpa ekstensi)
+	viper.SetConfigType("yaml")                  // Tipe file
 
 	viper.AutomaticEnv() // Baca juga dari environment variable jika ada
 
