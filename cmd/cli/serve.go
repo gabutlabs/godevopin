@@ -11,6 +11,7 @@ import (
 	"github.com/gabutlabs/godevopin/internal/handler"
 	"github.com/gabutlabs/godevopin/internal/model"
 	"github.com/gabutlabs/godevopin/internal/web"
+	"github.com/gabutlabs/godevopin/pkg"
 	"github.com/gofiber/fiber/v2" // Impor Fiber
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/spf13/cobra"
@@ -70,6 +71,27 @@ var serveCmd = &cobra.Command{
 				log.Printf("could not seed default settings: %v", err)
 			} else {
 				fmt.Println("Default settings seeded successfully.")
+			}
+		}
+
+		// Seeder untuk User Admin
+		var userCount int64
+		db.Model(&model.User{}).Count(&userCount)
+		if userCount == 0 {
+			hashedPassword, err := pkg.HashPassword("password1!")
+			if err != nil {
+				log.Printf("could not hash default admin password: %v", err)
+			} else {
+				defaultAdmin := model.User{
+					Name:     "Admin",
+					Email:    "admin@gabutngoding.com",
+					Password: hashedPassword,
+				}
+				if err := db.Create(&defaultAdmin).Error; err != nil {
+					log.Printf("could not seed default admin user: %v", err)
+				} else {
+					fmt.Println("Default admin user seeded successfully.")
+				}
 			}
 		}
 		app := fiber.New()
