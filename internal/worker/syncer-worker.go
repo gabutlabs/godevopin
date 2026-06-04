@@ -10,8 +10,8 @@ import (
 	"strings"
 
 	"github.com/coreos/go-systemd/v22/dbus"
-	"github.com/gabutlabs/devopin/internal/model"
-	service "github.com/gabutlabs/devopin/internal/services"
+	"github.com/gabutlabs/godevopin/internal/model"
+	service "github.com/gabutlabs/godevopin/internal/services"
 )
 
 // DiscoveredService is an internal struct to hold data from the OS.

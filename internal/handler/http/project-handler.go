@@ -3,9 +3,9 @@ package http_handler
 import (
 	"strconv"
 
-	"github.com/gabutlabs/devopin/internal/model"
-	service "github.com/gabutlabs/devopin/internal/services"
-	"github.com/gabutlabs/devopin/pkg"
+	"github.com/gabutlabs/godevopin/internal/model"
+	service "github.com/gabutlabs/godevopin/internal/services"
+	"github.com/gabutlabs/godevopin/pkg"
 	"github.com/gofiber/fiber/v2"
 )
 

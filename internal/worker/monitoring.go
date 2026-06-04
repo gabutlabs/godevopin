@@ -1,6 +1,6 @@
 package worker
 
-import service "github.com/gabutlabs/devopin/internal/services"
+import service "github.com/gabutlabs/godevopin/internal/services"
 
 type MonitoringWorker struct {
 	service service.SystemMetricService

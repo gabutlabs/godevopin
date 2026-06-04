@@ -1,8 +1,8 @@
 package http_handler
 
 import (
-	service "github.com/gabutlabs/devopin/internal/services"
-	"github.com/gabutlabs/devopin/pkg"
+	service "github.com/gabutlabs/godevopin/internal/services"
+	"github.com/gabutlabs/godevopin/pkg"
 	"github.com/gofiber/fiber/v2"
 )
 

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/gabutlabs/devopin/internal/model"
+	"github.com/gabutlabs/godevopin/internal/model"
 	"gorm.io/gorm"
 )
 

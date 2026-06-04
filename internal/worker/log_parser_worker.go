@@ -6,9 +6,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/gabutlabs/devopin/internal/logparser"
-	"github.com/gabutlabs/devopin/internal/model"
-	service "github.com/gabutlabs/devopin/internal/services"
+	"github.com/gabutlabs/godevopin/internal/logparser"
+	"github.com/gabutlabs/godevopin/internal/model"
+	service "github.com/gabutlabs/godevopin/internal/services"
 )
 
 type LogParserWorker struct {

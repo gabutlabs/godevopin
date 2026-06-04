@@ -11,8 +11,8 @@ import (
 	"time"
 
 	"github.com/coreos/go-systemd/v22/dbus"
-	"github.com/gabutlabs/devopin/internal/model"
-	"github.com/gabutlabs/devopin/internal/repository"
+	"github.com/gabutlabs/godevopin/internal/model"
+	"github.com/gabutlabs/godevopin/internal/repository"
 )
 
 type WorkerServiceService interface {

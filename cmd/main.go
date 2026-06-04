@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/gabutlabs/devopin/cmd/cli"
+	"github.com/gabutlabs/godevopin/cmd/cli"
 )
 
 func main() {

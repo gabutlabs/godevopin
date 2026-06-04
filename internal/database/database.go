@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	// GORM Imports
-	"github.com/gabutlabs/devopin/internal/config"
+	"github.com/gabutlabs/godevopin/internal/config"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )

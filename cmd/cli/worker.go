@@ -4,9 +4,9 @@ package cli
 import (
 	"log"
 
-	"github.com/gabutlabs/devopin/internal/config"
-	"github.com/gabutlabs/devopin/internal/database"
-	"github.com/gabutlabs/devopin/internal/worker"
+	"github.com/gabutlabs/godevopin/internal/config"
+	"github.com/gabutlabs/godevopin/internal/database"
+	"github.com/gabutlabs/godevopin/internal/worker"
 	"github.com/spf13/cobra"
 )
 

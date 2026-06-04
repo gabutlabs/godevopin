@@ -6,8 +6,8 @@ import (
 	"log"
 	"time"
 
-	service "github.com/gabutlabs/devopin/internal/services"
-	"github.com/gabutlabs/devopin/internal/services/ai"
+	service "github.com/gabutlabs/godevopin/internal/services"
+	"github.com/gabutlabs/godevopin/internal/services/ai"
 	"gopkg.in/telebot.v3"
 )
 

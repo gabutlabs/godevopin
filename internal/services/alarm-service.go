@@ -5,9 +5,9 @@ import (
 	"log"
 	"time"
 
-	"github.com/gabutlabs/devopin/internal/model"
-	"github.com/gabutlabs/devopin/internal/repository"
-	"github.com/gabutlabs/devopin/pkg"
+	"github.com/gabutlabs/godevopin/internal/model"
+	"github.com/gabutlabs/godevopin/internal/repository"
+	"github.com/gabutlabs/godevopin/pkg"
 )
 
 type AlarmService interface {

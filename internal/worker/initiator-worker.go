@@ -7,9 +7,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/gabutlabs/devopin/internal/config"
-	"github.com/gabutlabs/devopin/internal/repository"
-	service "github.com/gabutlabs/devopin/internal/services"
+	"github.com/gabutlabs/godevopin/internal/config"
+	"github.com/gabutlabs/godevopin/internal/repository"
+	service "github.com/gabutlabs/godevopin/internal/services"
 	"gorm.io/gorm"
 )
 

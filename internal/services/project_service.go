@@ -1,8 +1,8 @@
 package service
 
 import (
-	"github.com/gabutlabs/devopin/internal/model"
-	"github.com/gabutlabs/devopin/internal/repository"
+	"github.com/gabutlabs/godevopin/internal/model"
+	"github.com/gabutlabs/godevopin/internal/repository"
 )
 
 type ProjectService interface {

@@ -4,10 +4,10 @@ import (
 	"errors"
 	"time"
 
-	"github.com/gabutlabs/devopin/internal/config"
-	"github.com/gabutlabs/devopin/internal/model"
-	"github.com/gabutlabs/devopin/internal/repository"
-	"github.com/gabutlabs/devopin/pkg"
+	"github.com/gabutlabs/godevopin/internal/config"
+	"github.com/gabutlabs/godevopin/internal/model"
+	"github.com/gabutlabs/godevopin/internal/repository"
+	"github.com/gabutlabs/godevopin/pkg"
 	"github.com/golang-jwt/jwt/v5"
 )
 

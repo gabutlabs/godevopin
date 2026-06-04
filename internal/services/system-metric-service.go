@@ -4,9 +4,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/gabutlabs/devopin/internal/model"
-	"github.com/gabutlabs/devopin/internal/monitoring"
-	"github.com/gabutlabs/devopin/internal/repository"
+	"github.com/gabutlabs/godevopin/internal/model"
+	"github.com/gabutlabs/godevopin/internal/monitoring"
+	"github.com/gabutlabs/godevopin/internal/repository"
 )
 
 type SystemMetricService interface {

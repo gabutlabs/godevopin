@@ -31,7 +31,7 @@ echo "Detected System: $OS ($ARCH)"
 
 # Fetch latest release version from GitHub
 echo "Fetching latest version..."
-LATEST_TAG=$(curl -s "https://api.github.com/repos/gabutlabs/devopin/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+LATEST_TAG=$(curl -s "https://api.github.com/repos/gabutlabs/godevopin/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
 
 if [ -z "$LATEST_TAG" ]; then
     # Fallback to the known beta tag if API limit is reached or repository is private
@@ -42,7 +42,7 @@ else
 fi
 
 BINARY_NAME="godevopin-${OS}-${ARCH}"
-DOWNLOAD_URL="https://github.com/gabutlabs/devopin/releases/download/${LATEST_TAG}/${BINARY_NAME}"
+DOWNLOAD_URL="https://github.com/gabutlabs/godevopin/releases/download/${LATEST_TAG}/${BINARY_NAME}"
 
 echo "Downloading $BINARY_NAME from GitHub Releases..."
 TMP_DIR=$(mktemp -d)
@@ -68,7 +68,7 @@ sudo mkdir -p /opt/devopin
 CONFIG_FILE="/opt/devopin/config.yaml"
 if [ ! -f "$CONFIG_FILE" ]; then
     echo "Downloading example configuration..."
-    sudo curl -sSL -o "$CONFIG_FILE" "https://raw.githubusercontent.com/gabutlabs/devopin/main/configs/config.yaml.example"
+    sudo curl -sSL -o "$CONFIG_FILE" "https://raw.githubusercontent.com/gabutlabs/godevopin/main/configs/config.yaml.example"
     
     # If the file couldn't be downloaded from main (e.g. repo is private), create a basic one
     if grep -q "404: Not Found" "$CONFIG_FILE" || [ ! -s "$CONFIG_FILE" ]; then

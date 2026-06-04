@@ -1,4 +1,4 @@
-module github.com/gabutlabs/devopin
+module github.com/gabutlabs/godevopin
 
 go 1.25.0
 

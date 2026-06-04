@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/gabutlabs/devopin/internal/model"
-	service "github.com/gabutlabs/devopin/internal/services"
+	"github.com/gabutlabs/godevopin/internal/model"
+	service "github.com/gabutlabs/godevopin/internal/services"
 	"github.com/tmc/langchaingo/llms"
 )
 

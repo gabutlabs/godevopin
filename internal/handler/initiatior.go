@@ -1,11 +1,11 @@
 package handler
 
 import (
-	"github.com/gabutlabs/devopin/internal/config"
-	http_handler "github.com/gabutlabs/devopin/internal/handler/http"
-	"github.com/gabutlabs/devopin/internal/handler/socket"
-	"github.com/gabutlabs/devopin/internal/repository"
-	service "github.com/gabutlabs/devopin/internal/services"
+	"github.com/gabutlabs/godevopin/internal/config"
+	http_handler "github.com/gabutlabs/godevopin/internal/handler/http"
+	"github.com/gabutlabs/godevopin/internal/handler/socket"
+	"github.com/gabutlabs/godevopin/internal/repository"
+	service "github.com/gabutlabs/godevopin/internal/services"
 	jwtware "github.com/gofiber/contrib/jwt"
 	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"

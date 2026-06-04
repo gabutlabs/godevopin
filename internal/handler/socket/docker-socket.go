@@ -8,7 +8,7 @@ import (
 	"log"
 	"sync"
 
-	service "github.com/gabutlabs/devopin/internal/services"
+	service "github.com/gabutlabs/godevopin/internal/services"
 	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
 )
