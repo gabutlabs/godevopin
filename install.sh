@@ -46,11 +46,19 @@ DOWNLOAD_URL="https://github.com/gabutlabs/godevopin/releases/download/${LATEST_
 
 echo "Downloading $BINARY_NAME from GitHub Releases..."
 TMP_DIR=$(mktemp -d)
-curl -L -o "$TMP_DIR/devopin" "$DOWNLOAD_URL"
+if ! curl -f -L -o "$TMP_DIR/devopin" "$DOWNLOAD_URL"; then
+    echo "Error: Binary not found on GitHub Releases for this OS/Arch, or download failed."
+    echo "URL: $DOWNLOAD_URL"
+    echo "If your repository is Private, you cannot use this installer directly without authentication."
+    rm -rf "$TMP_DIR"
+    exit 1
+fi
 
-# Check if download was successful (not a 404 text file)
-if grep -q "Not Found" "$TMP_DIR/devopin"; then
-    echo "Error: Binary not found on GitHub Releases for this OS/Arch."
+# A GitHub "Not Found" page might occasionally be returned with HTTP 200, though curl -f usually catches 404s.
+# To be safe, we verify the file size. A valid Go binary is > 1MB, while an error page is tiny.
+FILE_SIZE=$(wc -c < "$TMP_DIR/devopin" | tr -d ' ')
+if [ "$FILE_SIZE" -lt 10000 ]; then
+    echo "Error: Downloaded file is too small to be a valid binary. It might be a 'Not Found' page."
     echo "URL: $DOWNLOAD_URL"
     echo "If your repository is Private, you cannot use this installer directly without authentication."
     rm -rf "$TMP_DIR"
