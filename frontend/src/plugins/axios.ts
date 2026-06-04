@@ -1,7 +1,7 @@
 import axios from 'axios'
 
-// Set the base URL from environment variable or use default
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
+// Set the base URL from environment variable or use relative path '/api' (inherits current domain/port automatically)
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api'
 axios.defaults.baseURL = API_BASE_URL
 
 // Add a request interceptor to include token in headers
