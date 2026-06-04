@@ -91,8 +91,55 @@ fi
 
 rm -rf "$TMP_DIR"
 
+# Setup systemd services if on Linux
+if [ "$OS" = "linux" ] && command -v systemctl >/dev/null 2>&1; then
+    echo "Setting up systemd services for devopin-serve and devopin-worker..."
+    
+    sudo bash -c 'cat > /etc/systemd/system/devopin-serve.service <<EOF
+[Unit]
+Description=Devopin Serve Service
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/devopin serve
+WorkingDirectory=/opt/devopin
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+EOF'
+
+    sudo bash -c 'cat > /etc/systemd/system/devopin-worker.service <<EOF
+[Unit]
+Description=Devopin Worker Service
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/devopin worker
+WorkingDirectory=/opt/devopin
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+EOF'
+
+    sudo systemctl daemon-reload
+    sudo systemctl enable devopin-serve devopin-worker
+    sudo systemctl start devopin-serve devopin-worker || true
+    echo "Systemd services (devopin-serve, devopin-worker) created, enabled, and started."
+fi
+
 echo "============================================="
 echo "Installation Successful!"
 echo "You can now run 'devopin serve' or 'devopin worker' from anywhere."
+if [ "$OS" = "linux" ] && command -v systemctl >/dev/null 2>&1; then
+    echo "Systemd services are configured and running. Manage them with:"
+    echo "  sudo systemctl status devopin-serve"
+    echo "  sudo systemctl status devopin-worker"
+fi
 echo "Don't forget to edit /opt/devopin/config.yaml with your settings."
 echo "============================================="
