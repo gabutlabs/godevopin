@@ -165,6 +165,17 @@ var serveCmd = &cobra.Command{
 		handler.SetupSocketHandlers(wsGroup, db, &cfg)
 		// -- END Socket Routes --
 
+		// Catch-all route for SPA (Single Page Application)
+		// Memastikan route frontend seperti /login tidak error 404 dari backend
+		app.Get("/*", func(c *fiber.Ctx) error {
+			indexHtml, err := web.IndexHtml.ReadFile("dist/index.html")
+			if err != nil {
+				return c.Status(404).SendString("index.html not found")
+			}
+			c.Set("Content-Type", "text/html")
+			return c.Send(indexHtml)
+		})
+
 		// Mulai server pada port yang ditentukan
 		fmt.Printf("Server Fiber berjalan di http://localhost:%d\n", port)
 		log.Fatal(app.Listen(fmt.Sprintf(":%d", port)))
