@@ -61,7 +61,11 @@ A complete CRUD interface for managing user access to the Devopin dashboard. It 
 
 - Go 1.24.0+
 - Node.js (for frontend development)
-- PostgreSQL
+- PostgreSQL with TimescaleDB extension enabled
+  > After installing PostgreSQL, activate the TimescaleDB extension on your database:
+  > ```sql
+  > CREATE EXTENSION IF NOT EXISTS timescaledb;
+  > ```
 
 ## Configuration
 
