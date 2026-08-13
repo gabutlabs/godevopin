@@ -5,6 +5,11 @@ export default [
     title: "Home",
   },
   {
+    link: "/processes",
+    icon: "mdi-chart-timeline-variant",
+    title: "Processes",
+  },
+  {
     link: "/users",
     icon: "mdi-account",
     title: "Users",

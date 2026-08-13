@@ -2,8 +2,9 @@ package repository
 
 import (
 	"errors"
-	"fmt"
+	"sort"
 	"strings"
+	"time"
 
 	"github.com/gabutlabs/godevopin/internal/model"
 	"gorm.io/gorm"
@@ -30,29 +31,25 @@ type ResultDiskUsage struct {
 
 type SystemMetricRepository interface {
 	CreateMetric(metric *model.SystemMetric) error
-	GetMetricByID(id uint) (*model.SystemMetric, error)
+	GetMetricByID(id string) (*model.SystemMetric, error)
 	UpdateMetric(metric *model.SystemMetric) error
-	DeleteMetric(id uint) error
+	DeleteMetric(id string) error
 	FilterSystemMetrics(filter string) ([]ResultSystemMetric, error)
 	LastSystemMetricsFilter(filter string) (LastSystemMetric, error)
 	GetDiskUsage() (ResultDiskUsage, error)
 }
+
 type systemMetricRepository struct {
-	// Tambahkan field yang diperlukan, misalnya koneksi database
 	db *gorm.DB
 }
 
-// NewSystemMetricRepository membuat instance baru dari systemMetricRepository
 func NewSystemMetricRepository(db *gorm.DB) SystemMetricRepository {
 	return &systemMetricRepository{db: db}
 }
 
-// Implementasikan metode CRUD sesuai kebutuhan
-// Contoh: CreateMetric, GetMetricByID, UpdateMetric, DeleteMetric, dll.
-// Contoh metode untuk mendapatkan metric berdasarkan ID
-func (r *systemMetricRepository) GetMetricByID(id uint) (*model.SystemMetric, error) {
+func (r *systemMetricRepository) GetMetricByID(id string) (*model.SystemMetric, error) {
 	var metric model.SystemMetric
-	if err := r.db.First(&metric, id).Error; err != nil {
+	if err := r.db.First(&metric, "id = ?", id).Error; err != nil {
 		return nil, err
 	}
 	return &metric, nil
@@ -66,119 +63,125 @@ func (r *systemMetricRepository) UpdateMetric(metric *model.SystemMetric) error 
 	return r.db.Save(metric).Error
 }
 
-func (r *systemMetricRepository) DeleteMetric(id uint) error {
-	return r.db.Delete(&model.SystemMetric{}, id).Error
+func (r *systemMetricRepository) DeleteMetric(id string) error {
+	return r.db.Delete(&model.SystemMetric{}, "id = ?", id).Error
 }
 
 func (r *systemMetricRepository) GetDiskUsage() (ResultDiskUsage, error) {
-	var diskUsage ResultDiskUsage
-	if err := r.db.Raw("select disk_usage_byte,disk_total_byte from system_metrics order by created_at desc").Scan(&diskUsage).Error; err != nil {
-		return ResultDiskUsage{DiskUsageByte: 0, DiskTotalByte: 0}, err
+	var metric model.SystemMetric
+	err := r.db.Order("created_at DESC").First(&metric).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return ResultDiskUsage{}, nil
 	}
-	return diskUsage, nil
+	if err != nil {
+		return ResultDiskUsage{}, err
+	}
+	return ResultDiskUsage{
+		DiskUsageByte: metric.DiskUsageByte,
+		DiskTotalByte: metric.DiskTotalByte,
+	}, nil
 }
 
+// FilterSystemMetrics performs time-window aggregation in Go so the repository
+// remains independent of database-specific date and bucketing functions.
 func (r *systemMetricRepository) FilterSystemMetrics(filter string) ([]ResultSystemMetric, error) {
-	var metrics []ResultSystemMetric
-	query := ""
-	if strings.HasSuffix(filter, "h") {
-		filterHour := "1 hour"
-		switch filter {
-		case "1h":
-			filterHour = "1 hour"
-		case "6h":
-			filterHour = "6 hours"
-		case "12h":
-			filterHour = "12 hours"
-		default:
-			return nil, errors.New("invalid filter format")
-		}
-		query = fmt.Sprintf(`
-				SELECT
-					-- Kelompokkan waktu ke dalam interval 15 detik
-					time_bucket('15 seconds', created_at) AS time_interval,
-					AVG(cpu_usage) AS avg_cpu_usage,
-					AVG(mem_usage_byte) AS avg_mem_usage
-					FROM
-					system_metrics -- <--- Mengambil dari tabel data MENTAH
-					WHERE
-					created_at > NOW() - interval '%s' -- <--- Filter waktu Anda
-					GROUP BY
-					time_interval
-					ORDER BY
-					time_interval;
-				`, filterHour)
-	} else if strings.HasSuffix(filter, "d") {
-		filterDay := "1 day"
-		switch filter {
-		case "1d":
-			filterDay = "1 day"
-		case "7d":
-			filterDay = "7 days"
-		case "30d":
-			filterDay = "30 days"
-		default:
-			return nil, errors.New("invalid filter format")
-		}
-		if filter == "1d" {
-			query = fmt.Sprintf(`
-				SELECT
-					hour as time_interval,
-					avg_cpu_usage,
-					avg_mem_usage
-					FROM
-					system_metrics_hourly -- <--- Mengambil dari tabel data MENTAH
-					WHERE
-					hour > NOW() - interval '%s' -- <--- Filter waktu Anda
-					GROUP BY
-					hour,avg_cpu_usage,avg_mem_usage
-					ORDER BY
-					hour;
-				`, filterDay)
-		} else {
-			query = fmt.Sprintf(`
-				SELECT days as time_interval,
-					avg_cpu_usage,
-					avg_mem_usage from system_metrics_daily
-				WHERE
-				days > NOW() - interval '%s' -- <--- Filter waktu Anda
-				ORDER BY
-				days;
-				`, filterDay)
-		}
-
-	}
-	if query == "" {
-		return nil, errors.New("invalid filter format")
-	}
-	if err := r.db.Raw(query).Scan(&metrics).Error; err != nil {
+	aggregates, err := r.aggregateMetrics(filter)
+	if err != nil {
 		return nil, err
 	}
-	return metrics, nil
-}
 
-// LastSystemMetricsFilter implements SystemMetricRepository.
-func (r *systemMetricRepository) LastSystemMetricsFilter(filter string) (LastSystemMetric, error) {
-	var result LastSystemMetric
-	query := fmt.Sprintf(`
-				SELECT
-					-- Kelompokkan waktu ke dalam interval 15 detik
-					time_bucket('15 seconds', created_at) AS time_interval,
-					AVG(cpu_usage) AS avg_cpu_usage,
-					AVG(mem_usage_byte) AS avg_mem_usage,
-					AVG(disk_usage_byte) AS avg_disk_usage,
-					AVG(disk_total_byte) AS avg_disk_total
-					FROM
-					system_metrics -- <--- Mengambil dari tabel data MENTAH
-					WHERE
-					created_at > NOW() - interval '%s' -- <--- Filter waktu Anda
-					GROUP BY
-					time_interval
-					ORDER BY
-					time_interval desc limit 1;
-				`, filter)
-	if err := r.db.Raw(query).Scan(&result).Error; err != nil {
-		return LastSystemMetric{}, err
+	result := make([]ResultSystemMetric, 0, len(aggregates))
+	for _, aggregate := range aggregates {
+		result = append(result, ResultSystemMetric{
+			TimeInterval: aggregate.time.UTC().Format(time.RFC3339),
+			AvgCPUUsage:  aggregate.cpu / float64(aggregate.count),
+			AvgMemUsage:  aggregate.mem / float64(aggregate.count),
+		})
 	}
 	return result, nil
+}
+
+func (r *systemMetricRepository) LastSystemMetricsFilter(filter string) (LastSystemMetric, error) {
+	aggregates, err := r.aggregateMetrics(filter)
+	if err != nil {
+		return LastSystemMetric{}, err
+	}
+	if len(aggregates) == 0 {
+		return LastSystemMetric{}, nil
+	}
+
+	aggregate := aggregates[len(aggregates)-1]
+	count := float64(aggregate.count)
+	return LastSystemMetric{
+		TimeInterval: aggregate.time.UTC().Format(time.RFC3339),
+		AvgCPUUsage:  aggregate.cpu / count,
+		AvgMemUsage:  aggregate.mem / count,
+		AvgDiskUsage: aggregate.disk / count,
+		AvgDiskTotal: aggregate.diskTotal / count,
+	}, nil
+}
+
+type metricAggregate struct {
+	time      time.Time
+	cpu       float64
+	mem       float64
+	disk      float64
+	diskTotal float64
+	count     int
+}
+
+func (r *systemMetricRepository) aggregateMetrics(filter string) ([]metricAggregate, error) {
+	duration, bucket, err := metricRange(filter)
+	if err != nil {
+		return nil, err
+	}
+
+	var metrics []model.SystemMetric
+	cutoff := time.Now().UTC().Add(-duration)
+	if err := r.db.Where("created_at >= ?", cutoff).Order("created_at ASC").Find(&metrics).Error; err != nil {
+		return nil, err
+	}
+
+	byBucket := make(map[int64]*metricAggregate)
+	for _, metric := range metrics {
+		bucketTime := metric.CreatedAt.UTC().Truncate(bucket)
+		key := bucketTime.UnixNano()
+		if byBucket[key] == nil {
+			byBucket[key] = &metricAggregate{time: bucketTime}
+		}
+		aggregate := byBucket[key]
+		aggregate.cpu += metric.CPUUsage
+		aggregate.mem += metric.MemUsageByte
+		aggregate.disk += metric.DiskUsageByte
+		aggregate.diskTotal += metric.DiskTotalByte
+		aggregate.count++
+	}
+
+	result := make([]metricAggregate, 0, len(byBucket))
+	for _, aggregate := range byBucket {
+		result = append(result, *aggregate)
+	}
+	sort.Slice(result, func(i, j int) bool {
+		return result[i].time.Before(result[j].time)
+	})
+	return result, nil
+}
+
+func metricRange(filter string) (time.Duration, time.Duration, error) {
+	switch strings.ToLower(strings.TrimSpace(filter)) {
+	case "1h", "1 hour":
+		return time.Hour, 15 * time.Second, nil
+	case "6h", "6 hours":
+		return 6 * time.Hour, 15 * time.Second, nil
+	case "12h", "12 hours":
+		return 12 * time.Hour, 15 * time.Second, nil
+	case "1d", "1 day":
+		return 24 * time.Hour, time.Hour, nil
+	case "7d", "7 days":
+		return 7 * 24 * time.Hour, 24 * time.Hour, nil
+	case "30d", "30 days":
+		return 30 * 24 * time.Hour, 24 * time.Hour, nil
+	default:
+		return 0, 0, errors.New("invalid filter format")
+	}
 }

@@ -52,14 +52,16 @@ func (s *systemMetricService) GetSystemMetrics() (map[string]any, error) {
 	if err != nil {
 		return nil, err
 	}
-	s.repository.CreateMetric(&model.SystemMetric{
-		ID:            strconv.FormatInt(time.Now().UTC().Unix(), 10),
+	if err := s.repository.CreateMetric(&model.SystemMetric{
+		ID:            strconv.FormatInt(time.Now().UTC().UnixNano(), 10),
 		CPUUsage:      cpuUsage.UsagePercent,
 		MemUsageByte:  float64(memoryUsage.Used),
 		MemTotalByte:  float64(memoryUsage.Total),
 		DiskUsageByte: float64(disk.Used),
 		DiskTotalByte: float64(disk.Total),
-	})
+	}); err != nil {
+		return nil, err
+	}
 	return map[string]any{
 		"cpu_usage":     cpuUsage,
 		"memory_usage":  memoryUsage,

@@ -23,15 +23,18 @@ var workerCmd = &cobra.Command{
 		if err != nil {
 			log.Fatalf("could not load config: %v", err)
 		}
-		db, err := database.ConnectDB(cfg.Database) // Sekarang db bertipe *gorm.DB
+		dbs, err := database.ConnectDB(cfg.Database)
 		if err != nil {
 			log.Fatalf("could not connect to database: %v", err)
+		}
+		if err := dbs.AutoMigrate(); err != nil {
+			log.Fatalf("could not migrate database: %v", err)
 		}
 		// if taskName == "" {
 		// 	fmt.Println("Error: Nama tugas tidak boleh kosong. Gunakan flag --task.")
 		// 	return
 		// }
-		worker.StartWorkers(&cfg, db)
+		worker.StartWorkers(&cfg, dbs)
 	},
 }
 

@@ -1,9 +1,9 @@
 database:
-  host: "localhost"
-  port: "5432"
-  user: "postgres"
-  password: ""
-  dbname: "devopin"
+  directory: "./data"
+  # Optional overrides. Relative paths are resolved from the process working directory.
+  main_path: ""
+  metrics_path: ""
+  logs_path: ""
 app:
   jwt_secret: "aaaaa"
 settings:

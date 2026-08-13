@@ -8,38 +8,42 @@ import (
 	"time"
 
 	"github.com/gabutlabs/godevopin/internal/config"
+	"github.com/gabutlabs/godevopin/internal/database"
 	"github.com/gabutlabs/godevopin/internal/repository"
 	service "github.com/gabutlabs/godevopin/internal/services"
-	"gorm.io/gorm"
 )
 
 // StartWorkers is a more descriptive name.
 // This function starts all workers and blocks until there is a shutdown signal.
-func StartWorkers(cfg *config.Config, db *gorm.DB) {
+func StartWorkers(cfg *config.Config, dbs *database.Connections) {
 	log.Println("Starting background workers...")
 
 	// --- Initialize all services and workers ---
 	// Monitoring Worker
-	sysmetricRepo := repository.NewSystemMetricRepository(db)
+	sysmetricRepo := repository.NewSystemMetricRepository(dbs.Metrics)
 	sysmetricService := service.NewSystemMetricService(sysmetricRepo)
 	monitWorker := NewMonitoringWorker(sysmetricService)
 
+	processMetricRepo := repository.NewProcessMetricRepository(dbs.Metrics)
+	processMonitoringService := service.NewProcessMonitoringService(processMetricRepo)
+	processMonitoringWorker := NewProcessMonitoringWorker(processMonitoringService)
+
 	// Host Syncer Worker
-	workerRepo := repository.NewWorkerServiceRepository(db)
+	workerRepo := repository.NewWorkerServiceRepository(dbs.App)
 	workerService := service.NewWorkerServiceService(workerRepo)
 	hostSyncer := NewSyncer(workerService)
 
 	// Threshold automation worker
-	alarmRepo := repository.NewAlarmRepository(db)
+	alarmRepo := repository.NewAlarmRepository(dbs.App)
 	alarmService := service.NewAlarmService(alarmRepo)
 
-	settingRepo := repository.NewSettingRepository(db)
+	settingRepo := repository.NewSettingRepository(dbs.App)
 	settingService := service.NewSettingService(settingRepo)
 
 	// Log Parser Worker
-	projectRepo := repository.NewProjectRepository(db)
+	projectRepo := repository.NewProjectRepository(dbs.App)
 	projectService := service.NewProjectService(projectRepo)
-	logHistoryRepo := repository.NewLogHistoryRepository(db)
+	logHistoryRepo := repository.NewLogHistoryRepository(dbs.Logs)
 	logHistoryService := service.NewLogHistoryService(logHistoryRepo)
 	logParserWorker := NewLogParserWorker(projectService, logHistoryService)
 
@@ -54,6 +58,7 @@ func StartWorkers(cfg *config.Config, db *gorm.DB) {
 
 	syncInterval := 5 * time.Minute // For example, sync interval is set differently
 	logParseInterval := 2 * time.Minute
+	processMonitoringInterval := 30 * time.Second
 
 	// Telegram AI Agent Worker
 	dockerService := service.NewDockerService()
@@ -61,6 +66,8 @@ func StartWorkers(cfg *config.Config, db *gorm.DB) {
 
 	// --- Run all workers as periodic goroutines ---
 	runPeriodicTask(monitWorker.StartMonitoring, monitoringInterval)
+	runPeriodicTask(processMonitoringWorker.CollectAndPersist, processMonitoringInterval)
+	runPeriodicTask(processMonitoringWorker.CleanupRetention, time.Hour)
 	runPeriodicTask(hostSyncer.SyncHostServices, syncInterval)
 	runPeriodicTask(thresholdAutomation.AlarmWorker, monitoringInterval)
 	runPeriodicTask(logParserWorker.Run, logParseInterval)

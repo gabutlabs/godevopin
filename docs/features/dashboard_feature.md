@@ -15,9 +15,9 @@ Fitur Dashboard merupakan halaman utama yang memberikan visualisasi real-time da
 
 ## Backend & Database
 - Data didapatkan dari backend yang mencatat System Metrics.
-- Menggunakan database PostgreSQL dengan ektensi **TimescaleDB** untuk penyimpanan time-series data.
-- Data disagregasi menggunakan materialized views (`system_metrics_hourly`, `system_metrics_daily`) untuk efisiensi query grafik berjangka panjang.
+- Menggunakan database SQLite khusus metrics untuk penyimpanan time-series data tanpa server database terpisah.
+- Data disagregasi di repository menggunakan bucket waktu yang kompatibel dengan SQLite untuk efisiensi query grafik berjangka panjang.
 
 ## Teknologi
 - Frontend: Vue 3, Vuetify, Pinia (`useWidgetStore`), Recharts/Echarts (untuk rendering chart).
-- Backend: Go, Fiber (HTTP REST), PostgreSQL (TimescaleDB).
+- Backend: Go, Fiber (HTTP REST), SQLite.

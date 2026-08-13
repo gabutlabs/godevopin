@@ -13,11 +13,10 @@ type Config struct {
 }
 
 type DBConfig struct {
-	Host     string `mapstructure:"host"`
-	Port     string `mapstructure:"port"`
-	User     string `mapstructure:"user"`
-	Password string `mapstructure:"password"`
-	DBName   string `mapstructure:"dbname"`
+	Directory   string `mapstructure:"directory"`
+	MainPath    string `mapstructure:"main_path"`
+	MetricsPath string `mapstructure:"metrics_path"`
+	LogsPath    string `mapstructure:"logs_path"`
 }
 
 // LoadConfig membaca konfigurasi dari file atau environment variables.
@@ -28,8 +27,8 @@ func LoadConfig() (config Config, err error) {
 	viper.AddConfigPath("/etc/devopin")          // Path konfigurasi global
 	viper.AddConfigPath("$HOME/.config/devopin") // Path konfigurasi user
 
-	viper.SetConfigName("config")                // Nama file (tanpa ekstensi)
-	viper.SetConfigType("yaml")                  // Tipe file
+	viper.SetConfigName("config") // Nama file (tanpa ekstensi)
+	viper.SetConfigType("yaml")   // Tipe file
 
 	viper.AutomaticEnv() // Baca juga dari environment variable jika ada
 

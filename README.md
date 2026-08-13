@@ -20,7 +20,7 @@ devopin/
 ├── internal/
 │   ├── web/                   # Embedded frontend assets (Vue/Vite dist folder)
 │   ├── config/                # Application configuration loader (Viper)
-│   ├── database/              # PostgreSQL DB connection & GORM setup
+│   ├── database/              # SQLite connection, migration, and store setup
 │   ├── handler/               # Fiber HTTP handlers & Socket.io endpoints
 │   ├── logparser/             # Log parsing and analysis engines
 │   ├── model/                 # GORM database models (User, SystemMetric, etc.)
@@ -36,51 +36,60 @@ devopin/
 Devopin is packed with built-in tools for holistic infrastructure management. Here is a high-level overview of the main capabilities:
 
 ### 1. 📊 System Monitoring Dashboard
-Real-time and historical visualization of system performance. It tracks key metrics such as **CPU, Memory, and Disk Usage**. Data is persistently stored using **PostgreSQL with TimescaleDB** for efficient time-series querying, allowing you to filter charts from the last 1 hour up to the last 30 days with seamless auto-refresh capabilities.
+Real-time and historical visualization of system performance. It tracks key metrics such as **CPU, Memory, and Disk Usage**. Data is persistently stored in a dedicated SQLite metrics database, allowing users to filter charts from the last 1 hour up to the last 30 days without requiring a separate database server.
 
-### 2. 🚨 Alarms & Alerts Management
+### 2. 🖥️ Htop-Style Process Monitoring
+The Processes page shows live CPU, memory, status, and thread usage for running processes. Top process samples are stored in the metrics database for historical inspection and automatically deleted after 30 days.
+
+### 3. 🚨 Alarms & Alerts Management
 Monitors system metrics against predefined thresholds. Whenever a threshold is breached, Devopin triggers an alert. You can manage **Active** alarms (FIRING) and review the **History** of past or ACKNOWLEDGED alarms to keep your infrastructure healthy.
 
-### 3. 🐳 Docker Management
+### 4. 🐳 Docker Management
 Get full visibility into your Docker environment directly from the UI. You can monitor and manage **Containers, Images, Networks, and Volumes**. Integrated with the Docker Engine API, it provides real-time status updates via WebSockets.
 
-### 4. ⚙️ Worker Services Control Panel
+### 5. ⚙️ Worker Services Control Panel
 A built-in control panel to orchestrate background tasks and internal daemon processes. You can monitor the lifecycle of each worker (**Start, Stop, Restart**), track their desired state, PIDs, health status, and last heartbeats.
 
-### 5. 📝 Log Tracing Engine
+### 6. 📝 Log Tracing Engine
 Designed to assist developers and sysadmins in analyzing `.log` files. Devopin includes a parsing engine that can extract meaningful information (Error Levels, Messages, Timestamps) from standard log formats, making it easier to trace specific issues across large log files.
 
-### 6. 🔐 User & Access Management
+### 7. 🔐 User & Access Management
 A complete CRUD interface for managing user access to the Devopin dashboard. It features secure **JWT-based authentication**, role-based access control, and password hashing (bcrypt) to ensure your system monitoring is safely guarded.
 
-### 7. 🚀 Embedded Web Frontend & CLI
+### 8. 🚀 Embedded Web Frontend & CLI
 - **Single Binary Deployment:** The entire Vue.js 3 / Vuetify frontend is embedded directly into the Go binary. No separate web server (like Nginx) is required to serve the UI!
 - **Cobra CLI:** Powerful command-line interface for local operations, worker task executions, and launching the server.
 
 ## Requirements
 
-- Go 1.24.0+
+- Go 1.25.0+
 - Node.js (for frontend development)
-- PostgreSQL with TimescaleDB extension enabled
-  > After installing PostgreSQL, activate the TimescaleDB extension on your database:
-  > ```sql
-  > CREATE EXTENSION IF NOT EXISTS timescaledb;
-  > ```
+- SQLite (bundled through the application; no database server is required)
+- CGO is disabled by the project build commands (`CGO_ENABLED=0`); no C compiler is required.
+
+The GORM SQLite adapter is `github.com/glebarez/sqlite`, backed by the pure-Go `modernc.org/sqlite` driver.
 
 ## Configuration
 
-The application uses a YAML-based configuration. Copy `configs/config.yaml.example` to `configs/config.yaml` and configure your database and JWT settings:
+The application uses a YAML-based configuration. Copy `configs/config.yaml.example` to `configs/config.yaml` and set the database directory and JWT secret:
 
 ```yaml
 database:
-  host: "localhost"
-  port: "5432"
-  user: "postgres"
-  password: "password"
-  dbname: "devopin"
+  directory: "./data"
+  main_path: ""
+  metrics_path: ""
+  logs_path: ""
 app:
   jwt_secret: "your-secure-secret"
 ```
+
+On first startup, Devopin creates the configured directory and these SQLite files when they are missing:
+
+- `godevopin.db`: users, projects, worker services, alarms, and settings.
+- `metrics.db`: host and process metric samples, with process history retained for 30 days.
+- `logs.db`: parsed project log entries and future journal/Docker logs.
+
+Each path can be overridden with an absolute or relative `main_path`, `metrics_path`, or `logs_path`.
 
 ## Installation
 

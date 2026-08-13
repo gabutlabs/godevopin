@@ -2,6 +2,7 @@ package repository
 
 import (
 	"github.com/gabutlabs/godevopin/internal/model"
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -22,6 +23,11 @@ func (r *logHistoryRepository) BatchInsert(logs []model.LogHistory) error {
 	if len(logs) == 0 {
 		return nil
 	}
+	for i := range logs {
+		if logs[i].ID == "" {
+			logs[i].ID = uuid.NewString()
+		}
+	}
 	return r.db.CreateInBatches(logs, 100).Error
 }
 
@@ -30,7 +36,7 @@ func (r *logHistoryRepository) GetLogsByProjectID(projectID uint, limit int, off
 	var total int64
 
 	db := r.db.Model(&model.LogHistory{}).Where("project_id = ?", projectID)
-	
+
 	if err := db.Count(&total).Error; err != nil {
 		return nil, 0, err
 	}

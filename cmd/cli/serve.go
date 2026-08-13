@@ -32,30 +32,19 @@ var serveCmd = &cobra.Command{
 			log.Fatalf("could not load config: %v", err)
 		}
 
-		// 2. Hubungkan ke database menggunakan GORM
-		db, err := database.ConnectDB(cfg.Database) // Sekarang db bertipe *gorm.DB
+		// 2. Open the independent SQLite stores.
+		dbs, err := database.ConnectDB(cfg.Database)
 		if err != nil {
 			log.Fatalf("could not connect to database: %v", err)
 		}
 
-		err = db.AutoMigrate(
-			&model.User{},
-			&model.SystemMetric{},
-			&model.WorkerService{},
-			&model.ActiveAlarm{},
-			&model.AlarmHistory{},
-			&model.Project{},
-			&model.AppSetting{},
-			&model.LogHistory{},
-		)
-
-		if err != nil {
+		if err := dbs.AutoMigrate(); err != nil {
 			log.Fatalf("could not migrate database: %v", err)
 		}
 
 		// Seeder untuk AppSetting
 		var count int64
-		db.Model(&model.AppSetting{}).Count(&count)
+		dbs.App.Model(&model.AppSetting{}).Count(&count)
 		if count == 0 {
 			defaultSetting := model.AppSetting{
 				ID:                            1,
@@ -67,7 +56,7 @@ var serveCmd = &cobra.Command{
 				SystemMemCriticalPercent:      85.0,
 				WorkerHeartbeatTimeoutSeconds: 300,
 			}
-			if err := db.Create(&defaultSetting).Error; err != nil {
+			if err := dbs.App.Create(&defaultSetting).Error; err != nil {
 				log.Printf("could not seed default settings: %v", err)
 			} else {
 				fmt.Println("Default settings seeded successfully.")
@@ -76,7 +65,7 @@ var serveCmd = &cobra.Command{
 
 		// Seeder untuk User Admin
 		var userCount int64
-		db.Model(&model.User{}).Count(&userCount)
+		dbs.App.Model(&model.User{}).Count(&userCount)
 		if userCount == 0 {
 			hashedPassword, err := pkg.HashPassword("password1!")
 			if err != nil {
@@ -87,7 +76,7 @@ var serveCmd = &cobra.Command{
 					Email:    "admin@gabutngoding.com",
 					Password: hashedPassword,
 				}
-				if err := db.Create(&defaultAdmin).Error; err != nil {
+				if err := dbs.App.Create(&defaultAdmin).Error; err != nil {
 					log.Printf("could not seed default admin user: %v", err)
 				} else {
 					fmt.Println("Default admin user seeded successfully.")
@@ -157,12 +146,12 @@ var serveCmd = &cobra.Command{
 			return c.Send(favicon)
 		})
 		apiGroup := app.Group("/api")
-		handler.SetupHandlers(apiGroup, db, &cfg)
+		handler.SetupHandlers(apiGroup, dbs, &cfg)
 		// -- END HTTP Routes --
 
 		// -- Socket Routes --
 		wsGroup := app.Group("/ws")
-		handler.SetupSocketHandlers(wsGroup, db, &cfg)
+		handler.SetupSocketHandlers(wsGroup, dbs, &cfg)
 		// -- END Socket Routes --
 
 		// Catch-all route for SPA (Single Page Application)

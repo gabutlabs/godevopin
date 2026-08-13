@@ -2,4 +2,7 @@ config.yaml
 dist
 build
 devopin
+*.db
+*.db-shm
+*.db-wal
 main

@@ -1,7 +1,7 @@
 # App Settings Feature
 
 ## Deskripsi Singkat
-Fitur **App Settings** memungkinkan administrator untuk mengelola konfigurasi operasional aplikasi secara dinamis melalui antarmuka web. Konfigurasi ini disimpan di database (PostgreSQL) dan langsung diterapkan pada sistem monitoring serta background workers tanpa perlu melakukan restart aplikasi atau mengubah file konfigurasi YAML secara manual.
+Fitur **App Settings** memungkinkan administrator untuk mengelola konfigurasi operasional aplikasi secara dinamis melalui antarmuka web. Konfigurasi ini disimpan di database SQLite utama dan langsung diterapkan pada sistem monitoring serta background workers tanpa perlu melakukan restart aplikasi atau mengubah file konfigurasi YAML secara manual.
 
 ## Komponen & Fungsionalitas
 1. **Manajemen Konfigurasi Global**:

@@ -83,11 +83,10 @@ if [ ! -f "$CONFIG_FILE" ]; then
         echo "Could not download config.yaml.example, generating a default one..."
         sudo bash -c 'cat > /opt/devopin/config.yaml <<EOF
 database:
-  host: "localhost"
-  port: "5432"
-  user: "postgres"
-  password: "password"
-  dbname: "devopin"
+  directory: "./data"
+  main_path: ""
+  metrics_path: ""
+  logs_path: ""
 app:
   jwt_secret: "change-this-secret-in-production"
 EOF'

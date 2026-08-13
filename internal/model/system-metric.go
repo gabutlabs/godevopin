@@ -9,6 +9,6 @@ type SystemMetric struct {
 	MemTotalByte  float64   `json:"mem_total_byte"`
 	DiskUsageByte float64   `json:"disk_usage_byte"`
 	DiskTotalByte float64   `json:"disk_total_byte"`
-	CreatedAt     time.Time `gorm:"primaryKey;type:timestamp with time zone;not null" json:"created_at"`
+	CreatedAt     time.Time `gorm:"primaryKey;not null;index" json:"created_at"`
 	UpdatedAt     time.Time `json:"updated_at"`
 }

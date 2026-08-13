@@ -178,7 +178,7 @@ func (r *alarmRepository) GetAllActiveAlarmsPaginated(page, limit int, sort stri
 	if sort != "" {
 		query = query.Order(sort)
 	} else {
-		query = query.Order("created_at DESC") // Default sort
+		query = query.Order("started_at DESC") // Default sort
 	}
 
 	if err := query.Offset(offset).Limit(limit).Find(&alarms).Error; err != nil {

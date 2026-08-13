@@ -2,6 +2,7 @@ package handler
 
 import (
 	"github.com/gabutlabs/godevopin/internal/config"
+	"github.com/gabutlabs/godevopin/internal/database"
 	http_handler "github.com/gabutlabs/godevopin/internal/handler/http"
 	"github.com/gabutlabs/godevopin/internal/handler/socket"
 	"github.com/gabutlabs/godevopin/internal/repository"
@@ -9,11 +10,10 @@ import (
 	jwtware "github.com/gofiber/contrib/jwt"
 	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
-	"gorm.io/gorm"
 )
 
-func SetupHandlers(router fiber.Router, db *gorm.DB, config *config.Config) {
-	userRepo := repository.NewUserRepository(db)
+func SetupHandlers(router fiber.Router, dbs *database.Connections, config *config.Config) {
+	userRepo := repository.NewUserRepository(dbs.App)
 	userService := service.NewUserService(userRepo)
 	userHandler := http_handler.NewUserHandler(userService)
 	authHandler := http_handler.NewAuthHandler(userService)
@@ -25,19 +25,25 @@ func SetupHandlers(router fiber.Router, db *gorm.DB, config *config.Config) {
 	userHandler.SetupUserRoutes(router)
 
 	// Setup SystemMetric routes
-	systemMetricRepo := repository.NewSystemMetricRepository(db)
+	systemMetricRepo := repository.NewSystemMetricRepository(dbs.Metrics)
 	systemMetricService := service.NewSystemMetricService(systemMetricRepo)
 	systemMetricHandler := http_handler.NewSystemMetricHandler(systemMetricService)
 	systemMetricHandler.SetupSystemMetricRoutes(router)
 
+	// Setup process monitoring routes
+	processMetricRepo := repository.NewProcessMetricRepository(dbs.Metrics)
+	processMonitoringService := service.NewProcessMonitoringService(processMetricRepo)
+	processHandler := http_handler.NewProcessMonitoringHandler(processMonitoringService)
+	processHandler.SetupProcessMonitoringRoutes(router)
+
 	// Setup WorkerService routes
-	workerServiceRepo := repository.NewWorkerServiceRepository(db)
+	workerServiceRepo := repository.NewWorkerServiceRepository(dbs.App)
 	workerServiceService := service.NewWorkerServiceService(workerServiceRepo)
 	workerServiceHandler := http_handler.NewWorkerServiceHandler(workerServiceService)
 	workerServiceHandler.SetupWorkerServiceRoutes(router)
 
 	// Setup Alarm routes
-	alarmRepo := repository.NewAlarmRepository(db)
+	alarmRepo := repository.NewAlarmRepository(dbs.App)
 	alarmService := service.NewAlarmService(alarmRepo)
 	alarmHandler := http_handler.NewAlarmHandler(alarmService)
 	alarmHandler.SetupAlarmRoutes(router)
@@ -48,21 +54,21 @@ func SetupHandlers(router fiber.Router, db *gorm.DB, config *config.Config) {
 	dockerHandler.SetupDockerRoutes(router)
 
 	// Setup Project routes
-	projectRepo := repository.NewProjectRepository(db)
+	projectRepo := repository.NewProjectRepository(dbs.App)
 	projectService := service.NewProjectService(projectRepo)
-	logHistoryRepo := repository.NewLogHistoryRepository(db)
+	logHistoryRepo := repository.NewLogHistoryRepository(dbs.Logs)
 	logHistoryService := service.NewLogHistoryService(logHistoryRepo)
 	projectHandler := http_handler.NewProjectHandler(projectService, logHistoryService)
 	projectHandler.SetupProjectRoutes(router)
 
 	// Setup Setting routes
-	settingRepo := repository.NewSettingRepository(db)
+	settingRepo := repository.NewSettingRepository(dbs.App)
 	settingService := service.NewSettingService(settingRepo)
 	settingHandler := http_handler.NewSettingHandler(settingService)
 	settingHandler.SetupSettingRoutes(router)
 }
 
-func SetupSocketHandlers(wsGroup fiber.Router, db *gorm.DB, config *config.Config) {
+func SetupSocketHandlers(wsGroup fiber.Router, dbs *database.Connections, config *config.Config) {
 	// Setup Docker Socket routes
 	wsGroup.Use(func(c *fiber.Ctx) error {
 		if websocket.IsWebSocketUpgrade(c) {

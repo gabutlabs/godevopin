@@ -7,6 +7,7 @@ GOCLEAN=$(GOCMD) clean
 # Dapatkan Arsitektur dan OS dari lingkungan saat ini
 GOARCH=$(shell go env GOARCH)
 GOOS=$(shell go env GOOS)
+CGO_ENABLED ?= 0
 
 # Jalur (Paths)
 BASE_PATH := $(shell pwd)
@@ -52,12 +53,12 @@ build_frontend:
 # Build untuk OS/Arsitektur yang sedang berjalan (Linux jika di Linux, Darwin jika di Darwin, dst.)
 build_core:
 	@echo "--- Membangun Core Go untuk $(GOOS)/$(GOARCH)..."
-	GOOS=$(GOOS) GOARCH=$(GOARCH) $(GOBUILD) -trimpath -ldflags '-s -w' -o $(BUILD_PATH)/$(BUILD_NAME) $(CORE_MAIN)
+	CGO_ENABLED=$(CGO_ENABLED) GOOS=$(GOOS) GOARCH=$(GOARCH) $(GOBUILD) -trimpath -ldflags '-s -w' -o $(BUILD_PATH)/$(BUILD_NAME) $(CORE_MAIN)
 
 # Target terpisah jika perlu kompilasi silang (cross-compile) ke Linux dari Mac/Windows
 build_core_linux:
 	@echo "--- Cross-compiling Core Go ke Linux/AMD64..."
-	GOOS=linux GOARCH=amd64 $(GOBUILD) -trimpath -ldflags '-s -w' -o $(BUILD_PATH)/$(BUILD_NAME)_linux_amd64 $(CORE_MAIN)
+	CGO_ENABLED=$(CGO_ENABLED) GOOS=linux GOARCH=amd64 $(GOBUILD) -trimpath -ldflags '-s -w' -o $(BUILD_PATH)/$(BUILD_NAME)_linux_amd64 $(CORE_MAIN)
 
 # ==============================================================================
 # 5. TARGET CLEANING
