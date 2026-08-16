@@ -58,11 +58,13 @@ func (c *Connections) AutoMigrate() error {
 		&model.AlarmHistory{},
 		&model.Project{},
 		&model.AppSetting{},
+		&model.PostgreSQLTarget{},
+		&model.MySQLTarget{},
 	); err != nil {
 		return fmt.Errorf("migrate app database: %w", err)
 	}
 
-	if err := c.Metrics.AutoMigrate(&model.SystemMetric{}, &model.ProcessMetric{}); err != nil {
+	if err := c.Metrics.AutoMigrate(&model.SystemMetric{}, &model.ProcessMetric{}, &model.PostgreSQLActivity{}, &model.MySQLActivity{}); err != nil {
 		return fmt.Errorf("migrate metrics database: %w", err)
 	}
 

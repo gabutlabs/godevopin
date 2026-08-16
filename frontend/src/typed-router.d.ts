@@ -20,9 +20,11 @@ declare module 'vue-router/auto-routes' {
   export interface RouteNamedMap {
     '/': RouteRecordInfo<'/', '/', Record<never, never>, Record<never, never>>,
     '/alarms/': RouteRecordInfo<'/alarms/', '/alarms', Record<never, never>, Record<never, never>>,
+    '/database-activity/': RouteRecordInfo<'/database-activity/', '/database-activity', Record<never, never>, Record<never, never>>,
     '/docker/': RouteRecordInfo<'/docker/', '/docker', Record<never, never>, Record<never, never>>,
     '/docker/container/[id]': RouteRecordInfo<'/docker/container/[id]', '/docker/container/:id', { id: ParamValue<true> }, { id: ParamValue<false> }>,
     '/login': RouteRecordInfo<'/login', '/login', Record<never, never>, Record<never, never>>,
+    '/postgresql-activity/': RouteRecordInfo<'/postgresql-activity/', '/postgresql-activity', Record<never, never>, Record<never, never>>,
     '/processes/': RouteRecordInfo<'/processes/', '/processes', Record<never, never>, Record<never, never>>,
     '/projects/': RouteRecordInfo<'/projects/', '/projects', Record<never, never>, Record<never, never>>,
     '/projects/[id]': RouteRecordInfo<'/projects/[id]', '/projects/:id', { id: ParamValue<true> }, { id: ParamValue<false> }>,
@@ -50,6 +52,10 @@ declare module 'vue-router/auto-routes' {
       routes: '/alarms/'
       views: never
     }
+    'src/pages/database-activity/index.vue': {
+      routes: '/database-activity/'
+      views: never
+    }
     'src/pages/docker/index.vue': {
       routes: '/docker/'
       views: never
@@ -60,6 +66,10 @@ declare module 'vue-router/auto-routes' {
     }
     'src/pages/login.vue': {
       routes: '/login'
+      views: never
+    }
+    'src/pages/postgresql-activity/index.vue': {
+      routes: '/postgresql-activity/'
       views: never
     }
     'src/pages/processes/index.vue': {

@@ -28,6 +28,16 @@ func StartWorkers(cfg *config.Config, dbs *database.Connections) {
 	processMonitoringService := service.NewProcessMonitoringService(processMetricRepo)
 	processMonitoringWorker := NewProcessMonitoringWorker(processMonitoringService)
 
+	postgresTargetRepo := repository.NewPostgreSQLTargetRepository(dbs.App)
+	postgresActivityRepo := repository.NewPostgreSQLActivityRepository(dbs.Metrics)
+	postgresActivityService := service.NewPostgreSQLActivityService(postgresTargetRepo, postgresActivityRepo, cfg.AppSetting.JWTSecret)
+	postgresActivityWorker := NewPostgreSQLActivityWorker(postgresActivityService)
+
+	mysqlTargetRepo := repository.NewMySQLTargetRepository(dbs.App)
+	mysqlActivityRepo := repository.NewMySQLActivityRepository(dbs.Metrics)
+	mysqlActivityService := service.NewMySQLActivityService(mysqlTargetRepo, mysqlActivityRepo, cfg.AppSetting.JWTSecret)
+	mysqlActivityWorker := NewMySQLActivityWorker(mysqlActivityService)
+
 	// Host Syncer Worker
 	workerRepo := repository.NewWorkerServiceRepository(dbs.App)
 	workerService := service.NewWorkerServiceService(workerRepo)
@@ -59,6 +69,7 @@ func StartWorkers(cfg *config.Config, dbs *database.Connections) {
 	syncInterval := 5 * time.Minute // For example, sync interval is set differently
 	logParseInterval := 2 * time.Minute
 	processMonitoringInterval := 30 * time.Second
+	postgresActivityInterval := 30 * time.Second
 
 	// Telegram AI Agent Worker
 	dockerService := service.NewDockerService()
@@ -68,6 +79,10 @@ func StartWorkers(cfg *config.Config, dbs *database.Connections) {
 	runPeriodicTask(monitWorker.StartMonitoring, monitoringInterval)
 	runPeriodicTask(processMonitoringWorker.CollectAndPersist, processMonitoringInterval)
 	runPeriodicTask(processMonitoringWorker.CleanupRetention, time.Hour)
+	runPeriodicTask(postgresActivityWorker.CollectAndPersist, postgresActivityInterval)
+	runPeriodicTask(postgresActivityWorker.CleanupRetention, time.Hour)
+	runPeriodicTask(mysqlActivityWorker.CollectAndPersist, postgresActivityInterval)
+	runPeriodicTask(mysqlActivityWorker.CleanupRetention, time.Hour)
 	runPeriodicTask(hostSyncer.SyncHostServices, syncInterval)
 	runPeriodicTask(thresholdAutomation.AlarmWorker, monitoringInterval)
 	runPeriodicTask(logParserWorker.Run, logParseInterval)

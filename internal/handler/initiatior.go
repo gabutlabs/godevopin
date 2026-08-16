@@ -36,6 +36,21 @@ func SetupHandlers(router fiber.Router, dbs *database.Connections, config *confi
 	processHandler := http_handler.NewProcessMonitoringHandler(processMonitoringService)
 	processHandler.SetupProcessMonitoringRoutes(router)
 
+	// Setup PostgreSQL activity routes. Target credentials are stored encrypted
+	// with the application secret and are never included in API responses.
+	postgresTargetRepo := repository.NewPostgreSQLTargetRepository(dbs.App)
+	postgresActivityRepo := repository.NewPostgreSQLActivityRepository(dbs.Metrics)
+	postgresActivityService := service.NewPostgreSQLActivityService(postgresTargetRepo, postgresActivityRepo, config.AppSetting.JWTSecret)
+	postgresActivityHandler := http_handler.NewPostgreSQLActivityHandler(postgresActivityService)
+	postgresActivityHandler.SetupRoutes(router)
+
+	// Setup MySQL activity routes.
+	mysqlTargetRepo := repository.NewMySQLTargetRepository(dbs.App)
+	mysqlActivityRepo := repository.NewMySQLActivityRepository(dbs.Metrics)
+	mysqlActivityService := service.NewMySQLActivityService(mysqlTargetRepo, mysqlActivityRepo, config.AppSetting.JWTSecret)
+	mysqlActivityHandler := http_handler.NewMySQLActivityHandler(mysqlActivityService)
+	mysqlActivityHandler.SetupRoutes(router)
+
 	// Setup WorkerService routes
 	workerServiceRepo := repository.NewWorkerServiceRepository(dbs.App)
 	workerServiceService := service.NewWorkerServiceService(workerServiceRepo)
